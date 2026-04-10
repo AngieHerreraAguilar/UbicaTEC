@@ -1,0 +1,52 @@
+.map-page {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.ubicatec-map {
+  flex: 1;
+  min-height: 400px;
+  background: #d6e9dd;
+}
+[data-theme='dark'] .ubicatec-map { background: #1a2e22; }
+.leaflet-container { outline: none; }
+
+/* Clickable rectangles get pointer cursor */
+.leaflet-interactive { cursor: pointer; }
+
+/* Smooth crossfade for floor swap */
+.ubicatec-floor-overlay {
+  transition: opacity 0.35s ease;
+}
+
+/* User location marker */
+.ubicatec-user-loc { background: none !important; border: none !important; }
+.ubicatec-user-loc__dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #3b82f6;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3), 0 2px 8px rgba(59, 130, 246, 0.4);
+  animation: user-pulse 2s ease infinite;
+}
+@keyframes user-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3), 0 2px 8px rgba(59, 130, 246, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.1), 0 2px 8px rgba(59, 130, 246, 0.4); }
+}
+
+/* Selected room highlight fades in after fly-to settles */
+.leaflet-interactive.ubicatec-highlight {
+  transition: fill-opacity 0.35s ease, stroke-width 0.35s ease;
+}
+
+/* Pin marker fades in (animate the marker pane element, not transform) */
+.leaflet-marker-icon.ubicatec-pin {
+  animation: pin-fade-in 0.35s ease both;
+}
+@keyframes pin-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

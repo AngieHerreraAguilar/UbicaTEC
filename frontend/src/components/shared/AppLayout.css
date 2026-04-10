@@ -1,0 +1,33 @@
+.app-layout {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+/* Map is full-bleed and uses its own internal panning */
+.app-layout--map { overflow: hidden; height: 100svh; }
+
+.app-layout__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  /* Default padding-bottom so content clears floating bottom nav */
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 116px);
+}
+
+/* Map page is full-bleed; pills float on top */
+.app-layout--map .app-layout__main {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+@media (min-width: 1024px) {
+  .app-layout {
+    max-width: none;
+    margin: 0;
+    box-shadow: none;
+    padding-left: 0;
+  }
+}

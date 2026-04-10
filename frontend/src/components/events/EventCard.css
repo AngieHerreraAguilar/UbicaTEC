@@ -1,0 +1,114 @@
+/* Figma: 169:113 — EventContainer */
+.event-card {
+  display: flex;
+  align-items: flex-end;
+  padding: 8px;
+  background: #fdfdfd;
+  border-radius: 8px;
+  box-shadow: 1px 1px 3.9px 0 rgba(0, 0, 0, 0.14);
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+}
+.event-card:hover { text-decoration: none; }
+
+.event-card__body {
+  flex: 1 0 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.event-card__title {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 1.1;
+  color: #16213e;
+  margin: 0;
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 190px;
+}
+
+.event-card__meta-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.event-card__meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.event-card__meta-item i {
+  font-size: 16px;
+  color: #383838;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.event-card__meta-item span {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1;
+  color: #383838;
+}
+
+.event-card__aside {
+  width: 141px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 9px;
+}
+
+.event-card__price {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1;
+  color: #e94560;
+  text-align: right;
+  margin: 0;
+  width: 100%;
+}
+.event-card__price--money { font-size: 0; }
+.event-card__currency { font-size: 16px; line-height: 1; }
+.event-card__amount { font-size: 20px; line-height: 1; }
+.event-card__pp { font-size: 12px; line-height: 1; }
+
+.event-card__availability {
+  width: 100%;
+  padding: 2px;
+  background: #e3eaff;
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 14px;
+  color: #16213e;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-theme='dark'] .event-card { background: #1c2a4e; }
+[data-theme='dark'] .event-card__title { color: #fdfdfd; }
+[data-theme='dark'] .event-card__meta-item i,
+[data-theme='dark'] .event-card__meta-item span { color: #e3eaff; }
+[data-theme='dark'] .event-card__availability {
+  background: rgba(227, 234, 255, 0.1);
+  color: #fdfdfd;
+}

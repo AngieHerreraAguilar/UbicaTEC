@@ -1,0 +1,223 @@
+/* Figma: 672:18726 — Destination Suggestion Card (Bottom Sheet Style) */
+.destination-card-wrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* Card overlaps with bottom nav: ends ~64px under the nav top edge,
+     so the floating Mapa/Eventos pill sits visually on top of the lower
+     part of the card (Figma: mb-[-64px] on both). */
+  /* Bottom nav total height ≈ 116px (selector 56 + padding 20+30 + safe area).
+     Overlap of -64px → card sits 116 - 64 = 52px above the screen bottom. */
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 52px);
+  z-index: 900;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 16px;
+  pointer-events: none;
+  animation: dest-card-up 0.25s ease both;
+}
+.destination-card-wrap.is-exiting {
+  animation: dest-card-down 0.22s ease forwards;
+}
+@keyframes dest-card-up {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes dest-card-down {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(20px); opacity: 0; }
+}
+
+.destination-card {
+  pointer-events: auto;
+  width: 350px;
+  max-width: 100%;
+  min-height: 273px;
+  background: #fdfdfd;
+  border: 1px solid #fdfdfd;
+  border-radius: 24px;
+  padding: 21px 21px 64px;
+  box-shadow: 0 20px 50px 0 rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 15px;
+}
+
+.destination-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.destination-card__head-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+.destination-card__eyebrow {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 10px;
+  line-height: 15px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #6073a6;
+}
+.destination-card__title {
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 24px;
+  line-height: 32px;
+  color: #16213e;
+  margin: 0;
+}
+
+.destination-card__building {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+  color: #6073a6;
+  letter-spacing: 0.1px;
+}
+.destination-card__building i {
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0.85;
+}
+
+[data-theme='dark'] .destination-card__building { color: #adb5bd; }
+
+.destination-card__floor-pill {
+  display: inline-block;
+  background: rgba(233, 69, 96, 0.1);
+  border: 1px solid rgba(233, 69, 96, 0.2);
+  color: #e94560;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 11px;
+  line-height: 16.5px;
+  letter-spacing: 0.275px;
+  text-transform: uppercase;
+  padding: 5px 13px;
+  border-radius: 9999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.destination-card__stats {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding-bottom: 9px;
+}
+.destination-card__stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.destination-card__stat-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 12px;
+  background: #eff6ff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #16213e;
+}
+.destination-card__stat-icon i { font-size: 14px; line-height: 1; }
+.destination-card__stat-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5px;
+}
+.destination-card__stat-label {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 10px;
+  line-height: 15px;
+  text-transform: uppercase;
+  color: #6073a6;
+}
+.destination-card__stat-text strong {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  color: #16213e;
+}
+
+.destination-card__cta {
+  width: 100%;
+  height: 56px;
+  border-radius: 66px;
+  background: linear-gradient(90deg, #16213e 0%, #6073a6 100%);
+  color: #fdfdfd;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-shadow:
+    0 10px 15px -3px rgba(0, 32, 69, 0.2),
+    0 4px 6px -4px rgba(0, 32, 69, 0.2);
+  transition: transform 0.1s ease, filter 0.2s ease;
+}
+.destination-card__cta:hover { filter: brightness(1.05); }
+.destination-card__cta:active { transform: scale(0.98); }
+.destination-card__cta i { font-size: 18px; line-height: 1; }
+.destination-card__cta span {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: -0.4px;
+  color: #fdfdfd;
+}
+
+.destination-card__from {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: #6073a6;
+}
+.destination-card__from i {
+  font-size: 16px;
+  color: #16213e;
+}
+.destination-card__from strong { color: #16213e; font-weight: 600; }
+
+.destination-card__hint {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: #8e8e8e;
+  text-align: center;
+  margin: 0;
+  opacity: 0.8;
+}
+
+[data-theme='dark'] .destination-card__from { color: #adb5bd; }
+[data-theme='dark'] .destination-card__from i,
+[data-theme='dark'] .destination-card__from strong { color: #fdfdfd; }
+[data-theme='dark'] .destination-card__hint { color: #6073a6; }
+
+[data-theme='dark'] .destination-card {
+  background: #1c2a4e;
+  border-color: #2a3a5c;
+}
+[data-theme='dark'] .destination-card__title { color: #fdfdfd; }
+[data-theme='dark'] .destination-card__stat-icon { background: rgba(227, 234, 255, 0.1); color: #fdfdfd; }
+[data-theme='dark'] .destination-card__stat-text strong { color: #fdfdfd; }
+[data-theme='dark'] .destination-card__close { background: rgba(255,255,255,0.1); color: #fdfdfd; }

@@ -1,0 +1,97 @@
+/* Figma: 169:95 — floating segmented selector */
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: env(safe-area-inset-bottom, 0px);
+  padding: 20px 33px 30px;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.50) 0%, #FFF 30.77%);
+  pointer-events: none;
+}
+.bottom-nav__select { pointer-events: auto; }
+
+.bottom-nav__select {
+  position: relative;
+  background: #fdfdfd;
+  border-radius: 71px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.25);
+  pointer-events: auto;
+}
+
+.bottom-nav__indicator {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 182px;
+  height: 44px;
+  border-radius: 96px;
+  background: #e3eaff;
+  box-shadow: inset 0 1px 1.3px 0 rgba(0, 0, 0, 0.25);
+  transform: translateX(0);
+  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+.bottom-nav__select[data-active='1'] .bottom-nav__indicator {
+  transform: translateX(182px);
+}
+
+.bottom-nav__tab {
+  position: relative;
+  z-index: 1;
+  width: 182px;
+  height: 44px;
+  padding: 8px 20px;
+  border-radius: 96px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-decoration: none;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 1;
+  color: #8e8e8e;
+  white-space: nowrap;
+  transition: color 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+              font-weight 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+.bottom-nav__tab:hover { text-decoration: none; }
+.bottom-nav__icon {
+  width: 0;
+  height: 24px;
+  opacity: 0;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: width 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+              margin 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bottom-nav__tab.is-active {
+  color: #16213e;
+  font-weight: 500;
+}
+.bottom-nav__tab.is-active .bottom-nav__icon {
+  width: 24px;
+  opacity: 1;
+}
+
+[data-theme='dark'] .bottom-nav__select { background: #1c2a4e; }
+[data-theme='dark'] .bottom-nav__tab { color: #adb5bd; }
+[data-theme='dark'] .bottom-nav__tab.is-active {
+  background: rgba(227, 234, 255, 0.15);
+  color: #fdfdfd;
+}
+
+/* Desktop: keep segmented pill, move to top-right or stay centered */
+@media (min-width: 1024px) {
+  .bottom-nav { padding: 32px; }
+}

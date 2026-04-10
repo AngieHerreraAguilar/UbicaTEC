@@ -1,0 +1,124 @@
+.login-page {
+  background: var(--color-brand-dark);
+  color: var(--text-on-dark);
+  min-height: 100svh;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 32px;
+}
+
+.login-page__back {
+  align-self: flex-start;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background: rgba(255,255,255,0.1);
+  color: var(--text-on-dark);
+  font-size: 18px;
+}
+
+.login-page__brand {
+  margin-top: 32px;
+  text-align: center;
+}
+.login-page__brand h1 {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 44px;
+  color: var(--text-on-dark);
+  letter-spacing: -0.03em;
+}
+.login-page__brand h1 .accent { color: var(--color-accent); }
+
+.login-form {
+  width: 100%;
+  max-width: 360px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  padding: 28px 24px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.login-form h2 {
+  color: var(--text-on-dark);
+  font-size: 22px;
+}
+.login-form__sub {
+  color: var(--text-on-dark-muted);
+  font-size: 14px;
+}
+.login-form__hint {
+  font-size: 12px;
+  color: var(--text-on-dark-muted);
+  opacity: 0.7;
+  text-align: center;
+}
+.login-form__hint code {
+  background: rgba(255,255,255,0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: ui-monospace, monospace;
+}
+.login-form__error {
+  color: #ffb3c1;
+  background: rgba(233, 69, 96, 0.15);
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+}
+
+.login-form .field > span {
+  color: var(--text-on-dark-muted);
+}
+.login-form .field input {
+  padding: 14px 16px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.08);
+  color: var(--text-on-dark);
+  border-radius: var(--radius-md);
+  font-size: 15px;
+}
+.login-form .field input::placeholder { color: rgba(255,255,255,0.4); }
+.login-form .field input:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.code-input {
+  letter-spacing: 0.5em;
+  font-size: 24px !important;
+  text-align: center;
+  font-weight: 700;
+}
+
+.login-form .btn-secondary {
+  background: transparent;
+  color: var(--text-on-dark-muted);
+  border-color: rgba(255,255,255,0.15);
+}
+
+.login-form--success {
+  align-items: center;
+  text-align: center;
+  padding: 40px 24px;
+}
+.login-form__check {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  font-size: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

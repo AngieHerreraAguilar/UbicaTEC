@@ -1,0 +1,242 @@
+{
+  "campus": {
+    "name": "TEC Sede Regional San Carlos",
+    "city": "Santa Clara, San Carlos, Alajuela",
+    "mapImage": "campus-map.svg",
+    "imageSize": [3033, 3492],
+    "initialCenter": [1285, 1875],
+    "initialZoom": -2,
+    "minZoom": -3,
+    "maxZoom": 2
+  },
+  "buildings": [
+    {
+      "id": "CE",
+      "name": "Edificio Ciencias Exactas",
+      "description": "Aulas y laboratorios de ciencias",
+      "frame": { "x": 980, "y": 1419, "w": 610, "h": 911.5 },
+      "bounds": [[980, 1419], [1590, 2330.5]],
+      "rooms": [
+        { "id": "CE-LAB-TESIS",  "name": "Laboratorio de Tesis",        "floor": 1, "type": "laboratorio", "capacity": 20, "bounds": [[1437, 1427], [1547, 1537]] },
+        { "id": "CE-LAB-AGRO",   "name": "Laboratorio Agropecuario",    "floor": 1, "type": "laboratorio", "capacity": 20, "bounds": [[1437, 1543], [1547, 1653]] },
+        { "id": "CE-A1",         "name": "A - 1",                       "floor": 1, "type": "aula",         "capacity": 30, "bounds": [[1437, 1680], [1552, 1752]] },
+        { "id": "CE-A2",         "name": "A - 2",                       "floor": 1, "type": "aula",         "capacity": 30, "bounds": [[1437, 1758], [1552, 1830]] },
+        { "id": "CE-A3",         "name": "A - 3",                       "floor": 1, "type": "aula",         "capacity": 30, "bounds": [[1437, 1835], [1552, 1907]] },
+        { "id": "CE-A4",         "name": "A - 4",                       "floor": 1, "type": "aula",         "capacity": 30, "bounds": [[1437, 1912], [1552, 1984]] },
+        { "id": "CE-FIS2",       "name": "Laboratorio de Física 2",     "floor": 1, "type": "laboratorio", "capacity": 25, "bounds": [[1200, 1856], [1310, 1984]] },
+        { "id": "CE-FIS1",       "name": "Laboratorio de Física 1",     "floor": 1, "type": "laboratorio", "capacity": 25, "bounds": [[1316, 1856], [1426, 1984]] },
+        { "id": "CE-QUI2",       "name": "Laboratorio de Química 2",    "floor": 1, "type": "laboratorio", "capacity": 25, "bounds": [[989, 1746], [1099, 1856]] },
+        { "id": "CE-QUI1",       "name": "Laboratorio de Química 1",    "floor": 1, "type": "laboratorio", "capacity": 25, "bounds": [[989, 1862], [1099, 1972]] },
+        { "id": "CE-BODEGA",     "name": "Bodega de Laboratorios",      "floor": 1, "type": "bodega",       "capacity": 0,  "bounds": [[989, 1978], [1099, 2088]] },
+        { "id": "CE-BIO2",       "name": "Laboratorio de Biología 2",   "floor": 1, "type": "laboratorio", "capacity": 25, "bounds": [[989, 2094], [1099, 2204]] },
+        { "id": "CE-BIO1",       "name": "Laboratorio de Biología 1",   "floor": 1, "type": "laboratorio", "capacity": 25, "bounds": [[989, 2210], [1099, 2320]] },
+        { "id": "CE-BANOS",      "name": "Baños",                       "floor": 1, "type": "servicio",     "capacity": 0,  "bounds": [[1137, 1856], [1194, 1933.5]] },
+        { "id": "CE-OFI-COMP",   "name": "Oficinas Escuela de Computación", "floor": 2, "type": "oficina",  "capacity": 30, "bounds": [[1437, 1429], [1547, 1684]] },
+        { "id": "CE-A5",         "name": "A - 5",                       "floor": 2, "type": "aula",         "capacity": 30, "bounds": [[1437, 1735], [1547, 1807]] },
+        { "id": "CE-A6",         "name": "A - 6",                       "floor": 2, "type": "aula",         "capacity": 30, "bounds": [[1437, 1813], [1547, 1885]] },
+        { "id": "CE-A7",         "name": "A - 7",                       "floor": 2, "type": "aula",         "capacity": 30, "bounds": [[1437, 1891], [1547, 1963]] },
+        { "id": "CE-A10",        "name": "A - 10",                      "floor": 2, "type": "aula",         "capacity": 30, "bounds": [[1205, 1853], [1277, 1963]] },
+        { "id": "CE-A9",         "name": "A - 9",                       "floor": 2, "type": "aula",         "capacity": 30, "bounds": [[1282, 1853], [1354, 1963]] },
+        { "id": "CE-A8",         "name": "A - 8",                       "floor": 2, "type": "aula",         "capacity": 30, "bounds": [[1359, 1853], [1431, 1963]] },
+        { "id": "CE-A14",        "name": "A - 14",                      "floor": 2, "type": "aula",         "capacity": 30, "bounds": [[989, 1746], [1099, 1818]] },
+        { "id": "CE-A13",        "name": "A - 13",                      "floor": 2, "type": "aula",         "capacity": 30, "bounds": [[989, 1823], [1099, 1895]] },
+        { "id": "CE-A11",        "name": "A - 11",                      "floor": 2, "type": "aula",         "capacity": 30, "bounds": [[989, 1900], [1099, 1972]] },
+        { "id": "CE-OFI-EXAC",   "name": "Oficinas Escuela de Ciencias Exactas", "floor": 2, "type": "oficina", "capacity": 30, "bounds": [[989, 1978], [1099, 2320]] },
+        { "id": "CE-BANOS-P2",   "name": "Baños",                       "floor": 2, "type": "servicio",     "capacity": 0,  "bounds": [[1137, 1856], [1194, 1933.5]] }
+      ]
+    },
+    {
+      "id": "AD",
+      "name": "Edificio Administrativo",
+      "description": "Oficinas administrativas y servicios",
+      "frame": { "x": 1929, "y": 1419, "w": 299.5, "h": 914 },
+      "bounds": [[1929, 1419], [2228.5, 2333]],
+      "rooms": [
+        { "id": "AD-SOP",      "name": "Soporte Técnico",            "floor": 1, "type": "oficina",   "capacity": 10, "bounds": [[2130, 1428], [2219, 1567]] },
+        { "id": "AD-DEPT-ADM", "name": "Departamento Administrativo", "floor": 1, "type": "oficina",   "capacity": 10, "bounds": [[2130, 1573], [2219, 1712]] },
+        { "id": "AD-DEPT-CON", "name": "Departamento Contable",       "floor": 1, "type": "oficina",   "capacity": 10, "bounds": [[2130, 1718], [2219, 1857]] },
+        { "id": "AD-ENF",      "name": "Enfermería",                  "floor": 1, "type": "salud",     "capacity": 8,  "bounds": [[2130, 1933], [2219, 2102]] },
+        { "id": "AD-BANOS",    "name": "Baños",                       "floor": 1, "type": "servicio",  "capacity": 0,  "bounds": [[2132, 2108], [2219, 2196]] },
+        { "id": "AD-DEVESA",   "name": "DEVESA",                      "floor": 1, "type": "oficina",   "capacity": 15, "bounds": [[1938, 2235], [2219, 2324]] },
+        { "id": "AD-RECTORIA", "name": "Rectoría y oficinas administrativas", "floor": 2, "type": "oficina", "capacity": 50, "bounds": [[2130, 1428], [2219, 1857]] },
+        { "id": "AD-BANOS-P2", "name": "Baños",                       "floor": 2, "type": "servicio",  "capacity": 0,  "bounds": [[2132, 1933], [2219, 2021]] },
+        { "id": "AD-CI",       "name": "Centro de Investigación",     "floor": 2, "type": "oficina",   "capacity": 20, "bounds": [[2130, 2028], [2219, 2197]] },
+        { "id": "AD-FEITEC",   "name": "FEITEC",                      "floor": 2, "type": "oficina",   "capacity": 25, "bounds": [[1938, 2235], [2219, 2324]] }
+      ]
+    },
+    {
+      "id": "PR",
+      "name": "Edificio Producción",
+      "description": "Aulas y laboratorios de producción industrial",
+      "frame": { "x": 982, "y": 1310, "w": 363, "h": 339 },
+      "bounds": [[982, 1310], [1345, 1649]],
+      "rooms": [
+        { "id": "PR-E107",     "name": "E - 107",                  "floor": 1, "type": "aula",        "capacity": 30, "bounds": [[990, 1317], [1062, 1403]] },
+        { "id": "PR-E106",     "name": "E - 106",                  "floor": 1, "type": "aula",        "capacity": 30, "bounds": [[1068, 1317], [1140, 1403]] },
+        { "id": "PR-E105",     "name": "E - 105",                  "floor": 1, "type": "aula",        "capacity": 30, "bounds": [[1146, 1317], [1218, 1403]] },
+        { "id": "PR-LAB-MAN",  "name": "Laboratorio de Manofactura", "floor": 1, "type": "laboratorio", "capacity": 25, "bounds": [[1224, 1317], [1337, 1404]] },
+        { "id": "PR-BANOS",    "name": "Baños",                    "floor": 1, "type": "servicio",    "capacity": 0,  "bounds": [[990, 1409], [1062, 1495]] },
+        { "id": "PR-E108",     "name": "E - 108",                  "floor": 1, "type": "aula",        "capacity": 30, "bounds": [[990, 1489], [1076, 1561]] },
+        { "id": "PR-E109",     "name": "E - 109",                  "floor": 1, "type": "aula",        "capacity": 30, "bounds": [[990, 1567], [1076, 1639]] },
+        { "id": "PR-LAB-CIR",  "name": "Laboratorio de Circuitos", "floor": 1, "type": "laboratorio", "capacity": 25, "bounds": [[1105, 1536], [1218, 1623]] },
+        { "id": "PR-LAB-PROD", "name": "Laboratorio de Producción", "floor": 1, "type": "laboratorio", "capacity": 25, "bounds": [[1224, 1536], [1337, 1623]] },
+        { "id": "PR-OFI-PROD", "name": "Oficinas de Producción",   "floor": 2, "type": "oficina",     "capacity": 20, "bounds": [[990, 1316], [1181, 1403]] },
+        { "id": "PR-E202",     "name": "E - 202",                  "floor": 2, "type": "aula",        "capacity": 30, "bounds": [[1187, 1317], [1259, 1403]] },
+        { "id": "PR-E201",     "name": "E - 201",                  "floor": 2, "type": "aula",        "capacity": 30, "bounds": [[1265, 1317], [1337, 1403]] },
+        { "id": "PR-BANOS-P2", "name": "Baños",                    "floor": 2, "type": "servicio",    "capacity": 0,  "bounds": [[990, 1409], [1062, 1495]] },
+        { "id": "PR-E206",     "name": "E - 206",                  "floor": 2, "type": "aula",        "capacity": 30, "bounds": [[990, 1489], [1076, 1561]] },
+        { "id": "PR-E207",     "name": "E - 207",                  "floor": 2, "type": "aula",        "capacity": 30, "bounds": [[990, 1567], [1076, 1639]] },
+        { "id": "PR-E210",     "name": "E - 210",                  "floor": 2, "type": "aula",        "capacity": 30, "bounds": [[1109, 1537], [1181, 1623]] },
+        { "id": "PR-E209",     "name": "E - 209",                  "floor": 2, "type": "aula",        "capacity": 30, "bounds": [[1187, 1537], [1259, 1623]] },
+        { "id": "PR-E208",     "name": "E - 208",                  "floor": 2, "type": "aula",        "capacity": 30, "bounds": [[1265, 1537], [1337, 1623]] }
+      ]
+    },
+    {
+      "id": "CO",
+      "name": "Edificio Computación",
+      "description": "Mini Auditorio y laboratorios",
+      "frame": { "x": 1843, "y": 382, "w": 302.5, "h": 165 },
+      "bounds": [[1843, 382], [2145.5, 547]],
+      "rooms": [
+        { "id": "CO-AUC1", "name": "AUC - 1",        "floor": 1, "type": "auditorio",   "capacity": 80, "bounds": [[1936, 389], [2020, 506]] },
+        { "id": "CO-LAB1", "name": "Lab - 1",        "floor": 1, "type": "laboratorio", "capacity": 30, "bounds": [[2021, 389], [2079, 506]] },
+        { "id": "CO-LAB2", "name": "Lab - 2",        "floor": 1, "type": "laboratorio", "capacity": 30, "bounds": [[2080, 389], [2138, 506]] },
+        { "id": "CO-BANOS","name": "Baños",          "floor": 1, "type": "servicio",    "capacity": 0,  "bounds": [[1849, 442], [1923, 506]] }
+      ]
+    },
+    {
+      "id": "GY",
+      "name": "Gimnasio TEC",
+      "description": "Cancha multiusos y aulas deportivas",
+      "frame": { "x": 1173, "y": 433, "w": 307.5, "h": 390 },
+      "bounds": [[1173, 433], [1480.5, 823]],
+      "rooms": [
+        { "id": "GY-DEPORTIVA",   "name": "Deportiva",          "floor": 1, "type": "aula",       "capacity": 30, "bounds": [[1180, 440], [1295, 489]] },
+        { "id": "GY-BANOS",       "name": "Baños",              "floor": 1, "type": "servicio",   "capacity": 0,  "bounds": [[1300, 440], [1396, 489]] },
+        { "id": "GY-CAMPO",       "name": "Áreas Deportivas",   "floor": 1, "type": "deportivo",  "capacity": 100,"bounds": [[1197, 494], [1377, 774]] },
+        { "id": "GY-OFI-DEP",     "name": "Oficinas Deportivas","floor": 1, "type": "oficina",    "capacity": 10, "bounds": [[1400, 440], [1474, 595]] },
+        { "id": "GY-GIMNASIO",    "name": "Gimnasio TEC",       "floor": 1, "type": "deportivo",  "capacity": 200,"bounds": [[1400, 598], [1474, 774]] }
+      ]
+    },
+    {
+      "id": "CU",
+      "name": "Edificio Culturales",
+      "description": "Aulas de música y arte",
+      "frame": { "x": 299, "y": 622, "w": 201.5, "h": 233 },
+      "bounds": [[299, 622], [500.5, 855]],
+      "rooms": [
+        { "id": "CU-BODEGA",      "name": "Bodega Utilería", "floor": 1, "type": "bodega",   "capacity": 0,  "bounds": [[371, 627], [495, 666]] },
+        { "id": "CU-OFI",         "name": "Oficina",         "floor": 1, "type": "oficina",  "capacity": 5,  "bounds": [[304, 684], [379, 742]] },
+        { "id": "CU-CANTO",       "name": "Aula de Canto",   "floor": 1, "type": "aula",     "capacity": 20, "bounds": [[412, 684], [495, 764]] },
+        { "id": "CU-BANOS",       "name": "Baños",           "floor": 1, "type": "servicio", "capacity": 0,  "bounds": [[304, 746], [379, 788]] },
+        { "id": "CU-COCINA",      "name": "Cocina",          "floor": 1, "type": "servicio", "capacity": 0,  "bounds": [[304, 791], [379, 849]] },
+        { "id": "CU-MUSICA",      "name": "Aula de Música",  "floor": 1, "type": "aula",     "capacity": 20, "bounds": [[412, 769], [495, 849]] }
+      ]
+    },
+    {
+      "id": "VE",
+      "name": "Vestidores",
+      "description": "Cambiadores y baños",
+      "frame": { "x": 620, "y": 747, "w": 234.5, "h": 110.5 },
+      "bounds": [[620, 747], [854.5, 857.5]],
+      "rooms": [
+        { "id": "VE-BANOS",  "name": "Baños",             "floor": 1, "type": "servicio", "capacity": 0,  "bounds": [[626, 791], [661, 851]] },
+        { "id": "VE-HOMBRES","name": "Cambiador Hombres", "floor": 1, "type": "servicio", "capacity": 0,  "bounds": [[666, 753], [755, 851]] },
+        { "id": "VE-MUJERES","name": "Cambiador Mujeres", "floor": 1, "type": "servicio", "capacity": 0,  "bounds": [[759, 753], [848, 851]] }
+      ]
+    },
+    {
+      "id": "ID",
+      "name": "Edificio Idiomas",
+      "description": "Aulas de inglés y humanidades",
+      "frame": { "x": 299, "y": 1100, "w": 415, "h": 160 },
+      "bounds": [[299, 1100], [714, 1260]],
+      "rooms": [
+        { "id": "ID-H101",     "name": "H-101",             "floor": 1, "type": "aula",     "capacity": 30, "bounds": [[305, 1107], [401, 1182]] },
+        { "id": "ID-BANOS",    "name": "Baños",             "floor": 1, "type": "servicio", "capacity": 0,  "bounds": [[305, 1188], [401, 1254]] },
+        { "id": "ID-OFI",      "name": "Oficina de Idiomas","floor": 1, "type": "oficina",  "capacity": 8,  "bounds": [[407, 1107], [503, 1232]] },
+        { "id": "ID-INGLES1",  "name": "Inglés 1",          "floor": 1, "type": "aula",     "capacity": 25, "bounds": [[509, 1107], [605, 1232]] },
+        { "id": "ID-INGLES2",  "name": "Inglés 2",          "floor": 1, "type": "aula",     "capacity": 25, "bounds": [[611, 1107], [707, 1232]] }
+      ]
+    },
+    {
+      "id": "FO",
+      "name": "Fotocopiadora",
+      "description": "Servicio de fotocopias",
+      "frame": { "x": 1238, "y": 1063, "w": 106, "h": 223.5 },
+      "bounds": [[1238, 1063], [1344, 1286.5]],
+      "rooms": [
+        { "id": "FO-FOTO",  "name": "Fotocopiadora", "floor": 1, "type": "servicio", "capacity": 0, "bounds": [[1245, 1070], [1337, 1210]] },
+        { "id": "FO-BANOS", "name": "Baños",         "floor": 1, "type": "servicio", "capacity": 0, "bounds": [[1245, 1230], [1337, 1279]] }
+      ]
+    },
+    {
+      "id": "CT",
+      "name": "Comedor TEC",
+      "description": "Cocinas y áreas de comedor",
+      "frame": { "x": 1668, "y": 1037, "w": 296.5, "h": 513.5 },
+      "bounds": [[1668, 1037], [1964.5, 1550.5]],
+      "rooms": [
+        { "id": "CT-BANOS",       "name": "Baños",               "floor": 1, "type": "servicio", "capacity": 0,  "bounds": [[1675, 1079], [1711, 1143]] },
+        { "id": "CT-COCINA-INST", "name": "Cocina Institucional","floor": 1, "type": "servicio", "capacity": 0,  "bounds": [[1716, 1075], [1816, 1185]] },
+        { "id": "CT-COCINA-PER",  "name": "Cocina Periférica",   "floor": 1, "type": "servicio", "capacity": 0,  "bounds": [[1821, 1075], [1921, 1185]] },
+        { "id": "CT-COMEDOR",     "name": "Área de Comedor",     "floor": 1, "type": "comedor",  "capacity": 200,"bounds": [[1677, 1190], [1956, 1382]] },
+        { "id": "CT-ANEXO",       "name": "Anexo",               "floor": 1, "type": "comedor",  "capacity": 100,"bounds": [[1677, 1387], [1956, 1541]] }
+      ]
+    },
+    {
+      "id": "AM",
+      "name": "Aulas Matemáticas",
+      "description": "Aulas A-15 y A-16",
+      "frame": { "x": 2034, "y": 1029, "w": 331.5, "h": 141.5 },
+      "bounds": [[2034, 1029], [2365.5, 1170.5]],
+      "rooms": [
+        { "id": "AM-BANOS",  "name": "Baños",  "floor": 1, "type": "servicio", "capacity": 0,  "bounds": [[2040, 1035], [2097, 1112]] },
+        { "id": "AM-A15",    "name": "A - 15", "floor": 1, "type": "aula",     "capacity": 30, "bounds": [[2101, 1035], [2162, 1128]] },
+        { "id": "AM-A16",    "name": "A - 16", "floor": 1, "type": "aula",     "capacity": 30, "bounds": [[2167, 1035], [2228, 1128]] },
+        { "id": "AM-A17",    "name": "A - 17", "floor": 1, "type": "aula",     "capacity": 30, "bounds": [[2233, 1035], [2294, 1128]] },
+        { "id": "AM-A18",    "name": "A - 18", "floor": 1, "type": "aula",     "capacity": 30, "bounds": [[2299, 1035], [2360, 1164]] }
+      ]
+    },
+    {
+      "id": "LA",
+      "name": "Laboratorios Auxiliares",
+      "description": "Lab-3 y Lab-4 auxiliares",
+      "frame": { "x": 2034, "y": 1222, "w": 201, "h": 120.5 },
+      "bounds": [[2034, 1222], [2235, 1342.5]],
+      "rooms": [
+        { "id": "LA-LAB3", "name": "Lab - 3", "floor": 1, "type": "laboratorio", "capacity": 25, "bounds": [[2042, 1228], [2132, 1336]] },
+        { "id": "LA-LAB4", "name": "Lab - 4", "floor": 1, "type": "laboratorio", "capacity": 25, "bounds": [[2138, 1228], [2228, 1336]] }
+      ]
+    },
+    {
+      "id": "CTEC",
+      "name": "Edificio CTEC",
+      "description": "Auditorio CTEC y pasarela",
+      "frame": { "x": 2033, "y": 2508, "w": 704.5, "h": 302.5 },
+      "bounds": [[2033, 2508], [2737.5, 2810.5]],
+      "rooms": [
+        { "id": "CTEC-AUDITORIO", "name": "Auditorio CTEC",     "floor": 1, "type": "auditorio", "capacity": 300,"bounds": [[2041, 2516], [2275, 2803]] },
+        { "id": "CTEC-BANOS",     "name": "Baños",              "floor": 1, "type": "servicio",  "capacity": 0,  "bounds": [[2283, 2516], [2387, 2596]] },
+        { "id": "CTEC-BODEGA",    "name": "Bodega de Multimedia","floor": 1, "type": "bodega",   "capacity": 0,  "bounds": [[2501, 2516], [2612, 2596]] },
+        { "id": "CTEC-SALA",      "name": "Sala de reuniones",  "floor": 1, "type": "oficina",   "capacity": 15, "bounds": [[2618, 2516], [2729, 2596]] },
+        { "id": "CTEC-PASARELA",  "name": "Pasarela CTEC",      "floor": 1, "type": "circulacion","capacity": 0, "bounds": [[2283, 2602], [2729, 2736]] }
+      ]
+    },
+    {
+      "id": "BI",
+      "name": "Biblioteca",
+      "description": "Centro de estudio, cómputo y servicios bibliotecarios",
+      "frame": { "x": 1227, "y": 2291, "w": 502, "h": 445.5 },
+      "bounds": [[1227, 2291], [1729, 2736.5]],
+      "rooms": [
+        { "id": "BI-ADMIN",     "name": "Administración",  "floor": 1, "type": "oficina",  "capacity": 10, "bounds": [[1435, 2297], [1595, 2468]] },
+        { "id": "BI-COMPUTO",   "name": "Área de Cómputo", "floor": 1, "type": "computo",  "capacity": 30, "bounds": [[1305, 2475], [1468, 2634]] },
+        { "id": "BI-CUBICULOS", "name": "Cubículos",       "floor": 1, "type": "estudio",  "capacity": 40, "bounds": [[1478, 2519], [1723, 2634]] },
+        { "id": "BI-BANOS",     "name": "Baños",           "floor": 1, "type": "servicio", "capacity": 0,  "bounds": [[1233, 2596], [1295, 2634]] },
+        { "id": "BI-247",       "name": "Sala 24/7",       "floor": 1, "type": "estudio",  "capacity": 25, "bounds": [[1264, 2641], [1363, 2730]] },
+        { "id": "BI-MULTIMEDIA","name": "Multimedia",      "floor": 1, "type": "estudio",  "capacity": 15, "bounds": [[1369, 2641], [1468, 2730]] }
+      ]
+    }
+  ]
+}

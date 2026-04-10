@@ -1,0 +1,40 @@
+{
+  "description": "Rutas predefinidas trazadas sobre pasillos/aceras reales del campus. Coords en SVG pixel space [x, y]. Frame offset: (1818.5, 1294.5).",
+  "routes": [
+    {
+      "id": "R1-corredor-principal",
+      "name": "Corredor principal E-W → Norte",
+      "points": [[2287, 1914], [1819, 1914], [1819, 1503]]
+    },
+    {
+      "id": "R2-admin-loop",
+      "name": "Corredor admin → techo norte",
+      "points": [[2289, 1917], [1824, 1917], [1824, 1557], [1976, 1557], [1976, 1295], [1824, 1295]]
+    },
+    {
+      "id": "R3-admin-enfermeria",
+      "name": "Corredor → Enfermería",
+      "points": [[2288, 1917], [2106, 1917], [2106, 2021], [2160, 2021]]
+    },
+    {
+      "id": "R4-admin-devesa",
+      "name": "Corredor → DEVESA",
+      "points": [[2286, 1915], [2108, 1915], [2108, 2216], [2160, 2216], [2160, 2282]]
+    },
+    {
+      "id": "R5-admin-contable",
+      "name": "Corredor → Depto Contable",
+      "points": [[2286, 1920], [2106, 1920], [2106, 1799], [2148, 1799]]
+    },
+    {
+      "id": "R6-admin-administrativo",
+      "name": "Corredor → Depto Administrativo",
+      "points": [[2288, 1922], [2111, 1922], [2111, 1646], [2153, 1646]]
+    },
+    {
+      "id": "R7-admin-soporte",
+      "name": "Corredor → Soporte Técnico",
+      "points": [[2291, 1920], [2111, 1920], [2111, 1503], [2150, 1503]]
+    }
+  ]
+}

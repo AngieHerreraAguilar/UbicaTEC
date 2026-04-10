@@ -1,0 +1,53 @@
+:root {
+  /* Brand (Figma) */
+  --color-brand-dark: #16213e;
+  --color-brand-darker: #0f1a33;
+  --color-accent: #e94560;
+  --color-accent-hover: #d83854;
+
+  /* Light theme */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-elevated: #ffffff;
+  --text-primary: #16213e;
+  --text-secondary: #6c757d;
+  --text-muted: #adb5bd;
+  --text-on-dark: #fdfdfd;
+  --text-on-dark-muted: #e3eaff;
+  --border: #e5e7eb;
+  --shadow-sm: 0 1px 2px rgba(22, 33, 62, 0.06);
+  --shadow-md: 0 4px 12px rgba(22, 33, 62, 0.1);
+  --shadow-lg: 0 12px 32px rgba(22, 33, 62, 0.16);
+
+  /* Typography */
+  --font-heading: 'Manrope', system-ui, -apple-system, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Layout */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+
+  /* Breakpoints (for reference in media queries) */
+  --bp-tablet: 768px;
+  --bp-desktop: 1024px;
+
+  /* App shell */
+  --nav-height: 72px;
+  --header-height: 56px;
+  --sidebar-width: 240px;
+}
+
+[data-theme='dark'] {
+  --bg-primary: #0f1a33;
+  --bg-secondary: #16213e;
+  --bg-elevated: #1c2a4e;
+  --text-primary: #e9ecef;
+  --text-secondary: #adb5bd;
+  --text-muted: #6c757d;
+  --border: #2a3a5c;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
