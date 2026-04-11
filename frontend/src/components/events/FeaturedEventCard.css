@@ -1,7 +1,9 @@
 /* Figma: 347:234 — Side Card - Robotica */
 .featured-card {
   position: relative;
-  display: block;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   background: #16213e;
   padding: 24px 32px;
   border-radius: 12px;
@@ -11,6 +13,7 @@
   overflow: hidden;
   text-decoration: none;
   color: #fdfdfd;
+  min-height: 218.5px;
 }
 .featured-card:hover { text-decoration: none; }
 

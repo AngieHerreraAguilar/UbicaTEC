@@ -13,6 +13,29 @@
 [data-theme='dark'] .ubicatec-map { background: #1a2e22; }
 .leaflet-container { outline: none; }
 
+/* Back to form button (when coming from create event) */
+.map-page__back-form {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 100px);
+  left: 16px;
+  z-index: 1000;
+  height: 44px;
+  padding: 0 18px 0 12px;
+  border-radius: 22px;
+  background: #16213e;
+  color: #fdfdfd;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 4px 16px rgba(22, 33, 62, 0.3);
+  animation: dest-card-up 0.3s ease both;
+}
+.map-page__back-form i { font-size: 20px; }
+.map-page__back-form:hover { filter: brightness(1.1); }
+
 /* Clickable rectangles get pointer cursor */
 .leaflet-interactive { cursor: pointer; }
 

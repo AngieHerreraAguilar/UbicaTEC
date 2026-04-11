@@ -13,10 +13,10 @@ let SEED_EVENTS = [
     time: '17:00',
     endTime: '19:00',
     type: 'charla',
-    buildingId: 'B1',
-    buildingName: 'Edificio A',
-    roomId: 'B1-201',
-    roomName: 'Aula 201',
+    buildingId: 'CO',
+    buildingName: 'Edificio Computación',
+    roomId: 'CO-AUC1',
+    roomName: 'AUC - 1 (Mini Auditorio)',
     organizer: 'Asociación de Computación',
     capacity: 30,
     available: 15,
@@ -34,10 +34,10 @@ let SEED_EVENTS = [
     time: '17:00',
     endTime: '22:00',
     type: 'feria',
-    buildingId: 'B4',
+    buildingId: 'GY',
     buildingName: 'Gimnasio TEC',
-    roomId: 'B4-GIM',
-    roomName: 'Gimnasio Principal',
+    roomId: 'GY-GIMNASIO',
+    roomName: 'Gimnasio TEC',
     organizer: 'FEITEC',
     capacity: 500,
     available: 3,
@@ -53,10 +53,10 @@ let SEED_EVENTS = [
     time: '17:00',
     endTime: '22:00',
     type: 'feria',
-    buildingId: 'B4',
+    buildingId: 'GY',
     buildingName: 'Gimnasio TEC',
-    roomId: 'B4-GIM',
-    roomName: 'Gimnasio Principal',
+    roomId: 'GY-CAMPO',
+    roomName: 'Áreas Deportivas',
     organizer: 'FEITEC',
     capacity: 500,
     price: '20000',
@@ -72,10 +72,10 @@ let SEED_EVENTS = [
     time: '17:00',
     endTime: '22:00',
     type: 'charla',
-    buildingId: 'B4',
-    buildingName: 'Gimnasio TEC',
-    roomId: 'B4-GIM',
-    roomName: 'Gimnasio Principal',
+    buildingId: 'CE',
+    buildingName: 'Edificio Ciencias Exactas',
+    roomId: 'CE-A3',
+    roomName: 'A - 3',
     organizer: 'FEITEC',
     capacity: 500,
     available: 300,
@@ -92,10 +92,10 @@ let SEED_EVENTS = [
     time: '09:00',
     endTime: '17:00',
     type: 'charla',
-    buildingId: 'B2',
-    buildingName: 'Edificio Computación',
-    roomId: 'B2-101',
-    roomName: 'Mini Auditorio | AUC - 1',
+    buildingId: 'CTEC',
+    buildingName: 'CTEC',
+    roomId: 'CTEC-AUDITORIO',
+    roomName: 'Auditorio CTEC',
     organizer: 'Asociación de Computación',
     capacity: 30,
     available: 30,
@@ -112,10 +112,10 @@ let SEED_EVENTS = [
     time: '08:00',
     endTime: '08:00',
     type: 'competencia',
-    buildingId: 'B1',
-    buildingName: 'Edificio A',
-    roomId: 'B1-301',
-    roomName: 'Sala de Cómputo 301',
+    buildingId: 'CO',
+    buildingName: 'Edificio Computación',
+    roomId: 'CO-LAB1',
+    roomName: 'Lab - 1',
     organizer: 'Escuela de Computación',
     capacity: 50,
     available: 50,
@@ -123,6 +123,13 @@ let SEED_EVENTS = [
     createdBy: 'admin@itcr.ac.cr',
   },
 ]
+
+const JOINED_KEY = 'ubicatec:joined-events'
+const DRAFT_KEY = 'ubicatec:event-draft'
+let DRAFT_EVENT = (() => {
+  try { return JSON.parse(localStorage.getItem(DRAFT_KEY)) }
+  catch { return null }
+})()
 
 const delay = (ms = 200) => new Promise((r) => setTimeout(r, ms))
 
@@ -138,7 +145,7 @@ export async function getEventById(id) {
 
 export async function createEvent(eventData) {
   await delay()
-  const newEvent = { ...eventData, id: Math.max(0, ...SEED_EVENTS.map((e) => e.id)) + 1 }
+  const newEvent = { ...eventData, id: Math.max(0, ...SEED_EVENTS.map((e) => e.id)) + 1, createdAt: Date.now() }
   SEED_EVENTS = [...SEED_EVENTS, newEvent]
   return { success: true, message: 'Evento creado exitosamente', id: newEvent.id }
 }
@@ -162,6 +169,47 @@ export function filterEvents(events, { date, type, roomId }) {
     if (roomId && event.roomId !== roomId) return false
     return true
   })
+}
+
+export async function saveDraft(formData) {
+  await delay(100)
+  DRAFT_EVENT = { ...formData, savedAt: Date.now() }
+  localStorage.setItem(DRAFT_KEY, JSON.stringify(DRAFT_EVENT))
+  return { success: true }
+}
+
+export async function loadDraft() {
+  await delay(50)
+  return DRAFT_EVENT
+}
+
+export async function clearDraft() {
+  DRAFT_EVENT = null
+  localStorage.removeItem(DRAFT_KEY)
+}
+
+// ── Event join persistence ──
+
+export function joinEvent(eventId) {
+  const joined = getJoinedEvents()
+  if (!joined.includes(eventId)) {
+    joined.push(eventId)
+    localStorage.setItem(JOINED_KEY, JSON.stringify(joined))
+  }
+  // Decrease available in memory
+  const ev = SEED_EVENTS.find((e) => e.id === Number(eventId))
+  if (ev && ev.capacity > 0 && ev.available > 0) {
+    ev.available -= 1
+  }
+}
+
+export function getJoinedEvents() {
+  try { return JSON.parse(localStorage.getItem(JOINED_KEY)) || [] }
+  catch { return [] }
+}
+
+export function hasJoinedEvent(eventId) {
+  return getJoinedEvents().includes(Number(eventId))
 }
 
 export function paginateEvents(events, page, pageSize = 10) {

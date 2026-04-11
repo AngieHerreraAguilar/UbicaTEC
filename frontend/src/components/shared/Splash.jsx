@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import watermarkBg from '../../assets/MapWatermarkBG.svg'
 import './Splash.css'
 
 export default function Splash() {
@@ -12,7 +13,10 @@ export default function Splash() {
 
   return (
     <div className="splash device-frame">
-      <div className="splash__watermark" aria-hidden="true" />
+      <div className="splash__watermark" aria-hidden="true">
+        <img src={watermarkBg} alt="" className="splash__watermark-img" draggable={false} />
+        <div className="splash__glow" />
+      </div>
       <div className="splash__content">
         <div className="splash__logo-wrap">
           <i className="fi fi-rr-marker splash__pin" aria-hidden="true" />

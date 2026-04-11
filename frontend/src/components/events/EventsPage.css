@@ -19,6 +19,19 @@
 }
 .events-page__toolbar.is-searching { gap: 0; }
 
+.events-page__toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: width 0.32s ease, opacity 0.28s ease;
+}
+.events-page__toolbar.is-searching .events-page__toolbar-left {
+  width: 0;
+  opacity: 0;
+  overflow: hidden;
+  gap: 0;
+}
+
 .events-page__icon-btn {
   width: 48px;
   height: 48px;

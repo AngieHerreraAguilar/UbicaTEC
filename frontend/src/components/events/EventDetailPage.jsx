@@ -1,8 +1,65 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { getEventById } from '../../services/eventService'
+import { getEventById, joinEvent, hasJoinedEvent } from '../../services/eventService'
+import { getCampus, getRoomById } from '../../services/mapService'
 import { useAuth } from '../../hooks/useAuth'
+import campusMapSvg from '../../assets/campus-map.svg'
 import './EventDetailPage.css'
+
+function LocationPreview({ event, onNavigate }) {
+  const campus = getCampus()
+  const [imgW, imgH] = campus.imageSize
+  const roomData = getRoomById(event.roomId)
+
+  const containerW = 330
+  const containerH = 192
+  const scale = 3
+  const renderedW = containerW * scale
+  const renderedH = renderedW * (imgH / imgW)
+
+  let imgLeft = -(renderedW - containerW) / 2
+  let imgTop = -(renderedH - containerH) / 2
+  if (roomData?.bounds) {
+    const [[x1, y1], [x2, y2]] = roomData.bounds
+    const cx = (x1 + x2) / 2
+    const cy = (y1 + y2) / 2
+    imgLeft = containerW / 2 - (cx / imgW) * renderedW
+    imgTop = containerH / 2 - (cy / imgH) * renderedH
+  }
+
+  return (
+    <section className="event-detail__location-card">
+      <div className="event-detail__location-map" aria-hidden="true">
+        <img
+          src={campusMapSvg}
+          alt=""
+          className="event-detail__location-map-img"
+          draggable={false}
+          style={{
+            width: `${renderedW}px`,
+            height: `${renderedH}px`,
+            left: `${imgLeft}px`,
+            top: `${imgTop}px`,
+          }}
+        />
+        <div className="event-detail__location-map-overlay" />
+        <div className="event-detail__location-pin">
+          <i className="fi fi-sr-marker" />
+        </div>
+      </div>
+      <h4 className="event-detail__location-title">
+        {event.buildingName}, Planta {roomData?.floor || 1}
+      </h4>
+      <p className="event-detail__location-sub">
+        {(event.roomName || '').toUpperCase()}
+      </p>
+      <button type="button" className="event-detail__location-button" onClick={onNavigate}>
+        <i className="fi fi-rr-map" />
+        Ver Ubicación
+      </button>
+    </section>
+  )
+}
 
 function formatLongDate(iso) {
   const d = new Date(iso + 'T00:00:00')
@@ -32,20 +89,34 @@ export default function EventDetailPage() {
   const [event, setEvent] = useState(null)
   const [loading, setLoading] = useState(true)
   const [joined, setJoined] = useState(false)
+  const [confirmed, setConfirmed] = useState(0)
 
   useEffect(() => {
     getEventById(id).then((data) => {
       setEvent(data)
+      setConfirmed(Math.floor(Math.random() * 15) + 3)
+      const alreadyJoined = hasJoinedEvent(Number(id))
+      setJoined(alreadyJoined)
+      if (alreadyJoined) setConfirmed((c) => c + 1)
       setLoading(false)
     })
   }, [id])
+
+  const isOpen = event?.capacity === 0
+  const soldOut = !isOpen && event?.available != null && event.available <= 0
 
   const handleJoin = () => {
     if (!isAuthenticated) {
       navigate(`/login?redirect=/evento/${id}&action=join`)
       return
     }
+    if (joined || soldOut) return
+    joinEvent(Number(id))
     setJoined(true)
+    setConfirmed((c) => c + 1)
+    if (!isOpen && event.available > 0) {
+      setEvent((ev) => ({ ...ev, available: ev.available - 1 }))
+    }
   }
 
   if (loading) return <div className="event-detail__state">Cargando...</div>
@@ -70,13 +141,12 @@ export default function EventDetailPage() {
 
       {/* Hero visual section */}
       <section className="event-detail__hero">
+        {event.bannerUrl && <img src={event.bannerUrl} alt="" className="event-detail__hero-img" />}
         <div className="event-detail__hero-gradient" />
         <div className="event-detail__hero-content">
-          {event.badge && (
-            <div className="event-detail__hero-badge">
-              <span>{event.badge}</span>
-            </div>
-          )}
+          <div className="event-detail__hero-badge">
+            <span>{event.badge || event.type || 'Evento'}</span>
+          </div>
           <h2 className="event-detail__hero-title">{event.title}</h2>
         </div>
       </section>
@@ -85,7 +155,7 @@ export default function EventDetailPage() {
       <section className="event-detail__host-card">
         {event.available != null && (
           <div className="event-detail__cupos-badge">
-            {event.available} cupos disponibles
+            {event.capacity === 0 ? 'Cupos ilimitados' : `${event.available} cupos disponibles`}
           </div>
         )}
         <div className="event-detail__host-row">
@@ -127,37 +197,17 @@ export default function EventDetailPage() {
           type="button"
           className="event-detail__rsvp-button"
           onClick={handleJoin}
-          disabled={joined}
+          disabled={joined || soldOut}
         >
-          {joined ? '¡Estás inscrito!' : 'Unirse al evento'}
+          {joined ? '¡Estás inscrito!' : soldOut ? 'Sin cupos disponibles' : 'Unirse al evento'}
         </button>
         <p className="event-detail__rsvp-footer">
-          13 ESTUDIANTES HAN CONFIRMADO ASISTENCIA
+          {confirmed} ESTUDIANTES HAN CONFIRMADO ASISTENCIA
         </p>
       </section>
 
       {/* Location preview card */}
-      <section className="event-detail__location-card">
-        <div className="event-detail__location-map" aria-hidden="true">
-          <div className="event-detail__location-pin">
-            <i className="fi fi-sr-marker" />
-          </div>
-        </div>
-        <h4 className="event-detail__location-title">
-          {event.buildingName}, Planta 1
-        </h4>
-        <p className="event-detail__location-sub">
-          {(event.roomName || '').toUpperCase()}
-        </p>
-        <button
-          type="button"
-          className="event-detail__location-button"
-          onClick={() => navigate('/mapa')}
-        >
-          <i className="fi fi-rr-map" />
-          Ver Ubicación
-        </button>
-      </section>
+      <LocationPreview event={event} onNavigate={() => navigate(`/mapa?from=evento&select=${event.roomId}`)} />
     </div>
   )
 }

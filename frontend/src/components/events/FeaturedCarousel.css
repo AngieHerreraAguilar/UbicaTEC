@@ -1,0 +1,33 @@
+.fc__track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  gap: 0;
+}
+.fc__track::-webkit-scrollbar { display: none; }
+
+.fc__slide {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+}
+
+.fc__dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+.fc__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(22, 33, 62, 0.15);
+  transition: background 0.2s ease, width 0.2s ease;
+}
+.fc__dot.is-active {
+  width: 24px;
+  border-radius: 4px;
+  background: #16213e;
+}

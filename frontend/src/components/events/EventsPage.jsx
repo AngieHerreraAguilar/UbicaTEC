@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { getEvents } from '../../services/eventService'
 import { useAuth } from '../../hooks/useAuth'
-import FeaturedEventCard from './FeaturedEventCard'
+import { logout } from '../../services/authService'
+import FeaturedCarousel from './FeaturedCarousel'
 import EventCard from './EventCard'
 import './EventsPage.css'
 
@@ -13,6 +14,7 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true)
   const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
 
   // Search state
   const [searching, setSearching] = useState(false)
@@ -21,12 +23,13 @@ export default function EventsPage() {
   const inputRef = useRef(null)
   const swapTimer = useRef(null)
 
+  // Refetch events every time we navigate to this page (e.g. after creating one)
   useEffect(() => {
     getEvents().then((data) => {
       setEvents(data)
       setLoading(false)
     })
-  }, [])
+  }, [location.key])
 
   useEffect(() => () => clearTimeout(swapTimer.current), [])
 
@@ -55,8 +58,8 @@ export default function EventsPage() {
     }, 20)
   }
 
-  const featured = events.find((e) => e.featured)
-  const regulars = events.filter((e) => !e.featured)
+  const featuredEvents = events.filter((ev) => ev.featured)
+  const regulars = events.filter((ev) => !ev.featured)
 
   // Normalize: strip accents + lowercase for fuzzy matching
   const norm = (s) =>
@@ -74,21 +77,32 @@ export default function EventsPage() {
     )
   }
 
-  const filteredFeatured = featured && matchesQuery(featured) ? featured : null
+  const filteredFeatured = featuredEvents.filter(matchesQuery)
   const filteredRegulars = regulars.filter(matchesQuery)
 
   return (
     <div className="events-page">
       <div className={'events-page__toolbar' + (searching ? ' is-searching' : '')}>
-        {/* + button: hides when searching */}
-        <button
-          type="button"
-          className="events-page__icon-btn events-page__add-btn"
-          onClick={handleCreate}
-          aria-label="Crear evento"
-        >
-          <i className="fi fi-sr-plus" />
-        </button>
+        <div className="events-page__toolbar-left">
+          <button
+            type="button"
+            className="events-page__icon-btn events-page__add-btn"
+            onClick={handleCreate}
+            aria-label="Crear evento"
+          >
+            <i className="fi fi-sr-plus" />
+          </button>
+          {isAuthenticated && (
+            <button
+              type="button"
+              className="events-page__icon-btn events-page__add-btn"
+              onClick={logout}
+              aria-label="Cerrar sesión"
+            >
+              <i className="fi fi-rr-sign-out-alt" />
+            </button>
+          )}
+        </div>
 
         {/* Search pill: expands when active */}
         <div className="events-page__search-pill">
@@ -120,9 +134,9 @@ export default function EventsPage() {
       <div className="events-page__list">
         {loading ? (
           <p className="events-page__state">Cargando eventos...</p>
-        ) : (filteredFeatured || filteredRegulars.length > 0) ? (
+        ) : (filteredFeatured.length > 0 || filteredRegulars.length > 0) ? (
           <>
-            {filteredFeatured && <FeaturedEventCard event={filteredFeatured} />}
+            {filteredFeatured.length > 0 && <FeaturedCarousel events={filteredFeatured} />}
             {filteredRegulars.map((ev) => (
               <EventCard key={ev.id} event={ev} />
             ))}

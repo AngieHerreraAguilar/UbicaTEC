@@ -9,6 +9,9 @@
   display: flex;
   justify-content: center;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.50) 0%, #FFF 30.77%);
+}
+.bottom-nav--transparent {
+  background: transparent;
   pointer-events: none;
 }
 .bottom-nav__select { pointer-events: auto; }

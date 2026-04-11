@@ -10,13 +10,14 @@ const TABS = [
 
 export default function BottomNav() {
   const location = useLocation()
+  const isMap = location.pathname === '/mapa'
   const activeIndex = Math.max(
     0,
     TABS.findIndex((t) => location.pathname.startsWith(t.to)),
   )
 
   return (
-    <nav className="bottom-nav" aria-label="Navegación principal">
+    <nav className={'bottom-nav' + (isMap ? ' bottom-nav--transparent' : '')} aria-label="Navegación principal">
       <div className="bottom-nav__select" data-active={activeIndex}>
         <span className="bottom-nav__indicator" aria-hidden="true" />
         {TABS.map((tab) => (

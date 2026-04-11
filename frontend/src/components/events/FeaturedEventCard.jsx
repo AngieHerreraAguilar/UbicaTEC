@@ -4,6 +4,7 @@ import './FeaturedEventCard.css'
 export default function FeaturedEventCard({ event }) {
   const total = event.capacity || 0
   const available = event.available ?? 0
+  const isOpen = total === 0
   const taken = Math.max(0, total - available)
   const progress = total > 0 ? Math.min(100, (taken / total) * 100) : 0
 
@@ -19,11 +20,13 @@ export default function FeaturedEventCard({ event }) {
       <p className="featured-card__desc">{event.description}</p>
       <div className="featured-card__availability">
         <i className="fi fi-sr-users-alt" />
-        <span>{available} Cupos libres</span>
+        <span>{isOpen ? 'Cupos ilimitados' : `${available} Cupos libres`}</span>
       </div>
-      <div className="featured-card__progress">
-        <div className="featured-card__progress-fill" style={{ width: `${progress}%` }} />
-      </div>
+      {!isOpen && (
+        <div className="featured-card__progress">
+          <div className="featured-card__progress-fill" style={{ width: `${progress}%` }} />
+        </div>
+      )}
     </Link>
   )
 }

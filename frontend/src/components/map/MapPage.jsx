@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import Header from '../shared/Header'
 import MapView from './MapView'
 import DestinationCard from './DestinationCard'
@@ -12,6 +13,11 @@ import './MapPage.css'
 const EXIT_MS = 220
 
 export default function MapPage() {
+  const navigate = useNavigate()
+  const [params] = useSearchParams()
+  const fromPage = params.get('from')
+  const selectRoomId = params.get('select')
+
   const [selection, setSelection] = useState(null)
   const [visible, setVisible] = useState(null)
   const [exiting, setExiting] = useState(false)
@@ -21,7 +27,20 @@ export default function MapPage() {
 
   const [searchResults, setSearchResults] = useState([])
   const [routePath, setRoutePath] = useState(null)
-  const [userLocation, setUserLocation] = useState(null) // [x, y] SVG coords
+  const [userLocation, setUserLocation] = useState(null)
+
+  // Auto-select room when coming from create event form
+  const didAutoSelect = useRef(false)
+  useEffect(() => {
+    if (selectRoomId && !didAutoSelect.current) {
+      didAutoSelect.current = true
+      const roomData = getRoomById(selectRoomId)
+      if (roomData) {
+        if (roomData.floor) setFloor(roomData.floor)
+        setSelection({ room: roomData, building: roomData.building })
+      }
+    }
+  }, [selectRoomId])
 
   const handleSearch = useCallback((query) => {
     setSearchResults(query ? searchAll(query) : [])
@@ -127,6 +146,16 @@ export default function MapPage() {
           onNavigate={handleExploreRoute}
           hasUserLocation={!!userLocation}
         />
+      )}
+      {fromPage && (
+        <button
+          type="button"
+          className="map-page__back-form"
+          onClick={() => navigate(-1)}
+        >
+          <i className="fi fi-rr-arrow-small-left" />
+          <span>{fromPage === 'crear-evento' ? 'Volver al formulario' : 'Volver al evento'}</span>
+        </button>
       )}
     </div>
   )
