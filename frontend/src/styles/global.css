@@ -52,6 +52,15 @@ input, select, textarea {
   }
 }
 
+@media (min-width: 1024px) {
+  body { background: var(--bg-primary); }
+  .device-frame {
+    max-width: none;
+    margin: 0;
+    box-shadow: none;
+  }
+}
+
 /* Primary button */
 .btn-primary {
   display: inline-flex;

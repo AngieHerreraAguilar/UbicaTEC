@@ -405,3 +405,19 @@
 [data-theme='dark'] .login__card-back { color: #fdfdfd; }
 [data-theme='dark'] .login__resend-link { color: #fdfdfd; }
 [data-theme='dark'] .login__hint code { background: rgba(255, 255, 255, 0.08); color: #adb5bd; }
+
+@media (min-width: 1024px) {
+  .login {
+    justify-content: center;
+    padding: 48px 0;
+  }
+  .login__card {
+    width: 420px;
+    max-width: 420px;
+    padding: 48px;
+  }
+  .login__topbar {
+    width: 420px;
+    max-width: 420px;
+  }
+}

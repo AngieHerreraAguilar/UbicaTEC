@@ -617,7 +617,19 @@
 [data-theme='dark'] .ce-field__location-selects select { background: #1c2a4e; border-color: #2a3a5c; color: #fdfdfd; }
 
 @media (min-width: 1024px) {
+  .create-event {
+    padding: 24px 32px 48px;
+  }
   .create-event__section,
   .create-event__topbar,
-  .create-event__actions { max-width: 720px; width: 100%; }
+  .create-event__actions {
+    max-width: 720px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .ce-bento { gap: 20px; }
+  .create-event__actions {
+    max-width: 480px;
+  }
 }

@@ -28,6 +28,18 @@
     max-width: none;
     margin: 0;
     box-shadow: none;
-    padding-left: 0;
+  }
+  .app-layout__main {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+    padding-bottom: 0;
+  }
+  .app-layout--map .app-layout__main {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+  }
+  .app-layout--no-nav .app-layout__main {
+    margin-left: 0;
+    width: 100%;
   }
 }

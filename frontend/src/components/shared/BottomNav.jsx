@@ -18,6 +18,9 @@ export default function BottomNav() {
 
   return (
     <nav className={'bottom-nav' + (isMap ? ' bottom-nav--transparent' : '')} aria-label="Navegación principal">
+      <div className="bottom-nav__brand" aria-hidden="true">
+        Ubica<span className="accent">TEC</span>
+      </div>
       <div className="bottom-nav__select" data-active={activeIndex}>
         <span className="bottom-nav__indicator" aria-hidden="true" />
         {TABS.map((tab) => (

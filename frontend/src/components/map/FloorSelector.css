@@ -39,3 +39,11 @@
   background: rgba(227, 234, 255, 0.15);
   color: #fdfdfd;
 }
+
+@media (min-width: 1024px) {
+  .floor-selector {
+    right: unset !important;
+    left: 16px;
+    top: calc(env(safe-area-inset-top, 0px) + 100px);
+  }
+}

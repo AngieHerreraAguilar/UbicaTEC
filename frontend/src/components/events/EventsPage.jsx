@@ -136,7 +136,11 @@ export default function EventsPage() {
           <p className="events-page__state">Cargando eventos...</p>
         ) : (filteredFeatured.length > 0 || filteredRegulars.length > 0) ? (
           <>
-            {filteredFeatured.length > 0 && <FeaturedCarousel events={filteredFeatured} />}
+            {filteredFeatured.length > 0 && (
+              <div className="events-page__featured-wrap">
+                <FeaturedCarousel events={filteredFeatured} />
+              </div>
+            )}
             {filteredRegulars.map((ev) => (
               <EventCard key={ev.id} event={ev} />
             ))}

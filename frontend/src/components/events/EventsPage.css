@@ -161,6 +161,14 @@
   .events-page__toolbar,
   .events-page__list {
     width: 100%;
-    max-width: 720px;
+    max-width: 960px;
+  }
+  .events-page__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  .events-page__featured-wrap {
+    grid-column: 1 / -1;
   }
 }

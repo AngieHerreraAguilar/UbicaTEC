@@ -10,6 +10,7 @@
   justify-content: center;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.50) 0%, #FFF 30.77%);
 }
+.bottom-nav__brand { display: none; }
 .bottom-nav--transparent {
   background: transparent;
   pointer-events: none;
@@ -94,7 +95,86 @@
   color: #fdfdfd;
 }
 
-/* Desktop: keep segmented pill, move to top-right or stay centered */
+/* ═══ Desktop: sidebar vertical izquierdo ═══ */
 @media (min-width: 1024px) {
-  .bottom-nav { padding: 32px; }
+  .bottom-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: auto;
+    bottom: 0;
+    width: var(--sidebar-width);
+    padding: 32px 20px;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    background: var(--bg-elevated);
+    border-right: 1px solid var(--border);
+    pointer-events: auto;
+  }
+  .bottom-nav--transparent { background: var(--bg-elevated); pointer-events: auto; }
+
+  /* Branding */
+  .bottom-nav__brand {
+    display: block;
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--text-primary);
+    text-align: center;
+    margin-bottom: 40px;
+    letter-spacing: -0.01em;
+  }
+  .bottom-nav__brand .accent { color: var(--color-accent); }
+
+  /* Select container → vertical */
+  .bottom-nav__select {
+    flex-direction: column;
+    border-radius: var(--radius-lg);
+    padding: 6px;
+    width: 100%;
+    box-shadow: none;
+    background: transparent;
+    gap: 4px;
+  }
+
+  /* Indicator → vertical slide */
+  .bottom-nav__indicator {
+    width: calc(100% - 12px);
+    height: 48px;
+    border-radius: var(--radius-md);
+    transform: translateX(0) translateY(0);
+  }
+  .bottom-nav__select[data-active='1'] .bottom-nav__indicator {
+    transform: translateX(0) translateY(calc(48px + 4px));
+  }
+
+  /* Tabs → horizontal row, full width */
+  .bottom-nav__tab {
+    width: 100%;
+    height: 48px;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    justify-content: flex-start;
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  /* Icons always visible, always on the left */
+  .bottom-nav__icon {
+    width: 22px;
+    height: 22px;
+    opacity: 0.4;
+    order: -1;
+  }
+  .bottom-nav__tab.is-active .bottom-nav__icon {
+    width: 22px;
+    opacity: 1;
+  }
+
+  /* Dark mode sidebar */
+  [data-theme='dark'] .bottom-nav {
+    background: var(--color-brand-darker);
+    border-right-color: rgba(255,255,255,0.06);
+  }
 }

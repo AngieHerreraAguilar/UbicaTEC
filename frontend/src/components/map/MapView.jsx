@@ -142,6 +142,10 @@ export default function MapView({ onRoomSelect, selectedRoomId, onClear, floor, 
   const [cx, cy] = campus.initialCenter
   const center = [imgH - cy, cx]
 
+  // Desktop gets more zoom since more screen space is available
+  const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024
+  const initialZoom = isDesktop ? -1 : campus.initialZoom
+
   const hiddenStyle = { color: '#e94560', weight: 0, fillOpacity: 0, fillColor: '#e94560' }
   const hoverStyle = { weight: 3, fillOpacity: 0.18 }
 
@@ -180,7 +184,7 @@ export default function MapView({ onRoomSelect, selectedRoomId, onClear, floor, 
     <MapContainer
       crs={L.CRS.Simple}
       center={center}
-      zoom={campus.initialZoom}
+      zoom={initialZoom}
       minZoom={campus.minZoom}
       maxZoom={campus.maxZoom}
       maxBounds={mapBounds}

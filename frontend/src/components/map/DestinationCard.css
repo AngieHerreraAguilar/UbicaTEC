@@ -221,3 +221,26 @@
 [data-theme='dark'] .destination-card__stat-icon { background: rgba(227, 234, 255, 0.1); color: #fdfdfd; }
 [data-theme='dark'] .destination-card__stat-text strong { color: #fdfdfd; }
 [data-theme='dark'] .destination-card__close { background: rgba(255,255,255,0.1); color: #fdfdfd; }
+
+@media (min-width: 1024px) {
+  .destination-card-wrap {
+    left: auto;
+    right: 24px;
+    top: 100px;
+    bottom: auto;
+    width: 380px;
+    padding: 0;
+    align-items: flex-start;
+    animation-name: dest-card-slide-in;
+  }
+  .destination-card-wrap.is-exiting { animation-name: dest-card-slide-out; }
+  .destination-card { width: 100%; min-height: auto; padding: 24px; }
+  @keyframes dest-card-slide-in {
+    from { transform: translateX(20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  @keyframes dest-card-slide-out {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(20px); opacity: 0; }
+  }
+}

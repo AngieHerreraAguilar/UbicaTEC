@@ -360,6 +360,18 @@
 }
 
 @media (min-width: 1024px) {
+  .event-detail {
+    padding: 24px 32px 48px;
+  }
   .event-detail > section,
-  .event-detail__topbar { max-width: 720px; width: 100%; }
+  .event-detail__topbar {
+    max-width: 720px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .event-detail__hero {
+    height: 480px;
+    border-radius: 16px;
+  }
 }

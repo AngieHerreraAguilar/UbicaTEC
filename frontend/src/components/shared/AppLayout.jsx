@@ -7,7 +7,7 @@ export default function AppLayout() {
   const isMap = location.pathname === '/mapa'
   const hideNav = location.pathname === '/crear-evento' || location.pathname.startsWith('/evento/')
   return (
-    <div className={'app-layout device-frame' + (isMap ? ' app-layout--map' : '')}>
+    <div className={'app-layout device-frame' + (isMap ? ' app-layout--map' : '') + (hideNav ? ' app-layout--no-nav' : '')}>
       <main className="app-layout__main">
         <Outlet />
       </main>

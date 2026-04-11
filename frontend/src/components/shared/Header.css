@@ -215,6 +215,14 @@
 [data-theme='dark'] .app-header__search,
 [data-theme='dark'] .app-header__input { color: #fdfdfd; }
 [data-theme='dark'] .app-header__input::placeholder { color: #adb5bd; }
+
+@media (min-width: 1024px) {
+  .app-header { left: var(--sidebar-width); }
+  .app-header__pill { max-width: 480px; }
+  .app-header__brand { display: none; }
+  .app-header__dropdown,
+  .app-header__recents { max-width: 480px; }
+}
 [data-theme='dark'] .app-header__dropdown,
 [data-theme='dark'] .app-header__recents { background: #1c2a4e; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); }
 [data-theme='dark'] .app-header__result-name { color: #fdfdfd; }
