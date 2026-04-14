@@ -57,6 +57,7 @@
   width: 16px;
   height: 16px;
   flex-shrink: 0;
+  color: #383838;
 }
 .event-card__meta-item span {
   font-family: var(--font-body);
@@ -107,7 +108,7 @@
 
 [data-theme='dark'] .event-card { background: #1c2a4e; }
 [data-theme='dark'] .event-card__title { color: #fdfdfd; }
-[data-theme='dark'] .event-card__meta-item i,
+[data-theme='dark'] .event-card__meta-icon,
 [data-theme='dark'] .event-card__meta-item span { color: #e3eaff; }
 [data-theme='dark'] .event-card__availability {
   background: rgba(227, 234, 255, 0.1);

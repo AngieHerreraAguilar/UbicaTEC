@@ -88,10 +88,17 @@
   opacity: 1;
 }
 
+[data-theme='dark'] .bottom-nav {
+  background: linear-gradient(180deg, rgba(15, 26, 51, 0) 0%, #0f1a33 30.77%);
+}
+[data-theme='dark'] .bottom-nav--transparent { background: transparent; }
 [data-theme='dark'] .bottom-nav__select { background: #1c2a4e; }
+[data-theme='dark'] .bottom-nav__indicator {
+  background: rgba(227, 234, 255, 0.15);
+  box-shadow: inset 0 1px 1.3px 0 rgba(0, 0, 0, 0.4);
+}
 [data-theme='dark'] .bottom-nav__tab { color: #adb5bd; }
 [data-theme='dark'] .bottom-nav__tab.is-active {
-  background: rgba(227, 234, 255, 0.15);
   color: #fdfdfd;
 }
 

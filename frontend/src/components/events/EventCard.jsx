@@ -1,7 +1,5 @@
 import { Link } from 'react-router-dom'
-import iconCalendar from '../../assets/icon-calendar.svg'
-import iconClock from '../../assets/icon-clock.svg'
-import iconLocation from '../../assets/icon-location.svg'
+import { IconCalendar, IconClock, IconLocation } from '../shared/Icons'
 import './EventCard.css'
 
 const MONTHS_ES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
@@ -39,16 +37,16 @@ export default function EventCard({ event }) {
         <div className="event-card__meta">
           <div className="event-card__meta-row">
             <div className="event-card__meta-item">
-              <img src={iconCalendar} alt="" className="event-card__meta-icon" />
+              <IconCalendar className="event-card__meta-icon" />
               <span>{formatShortDate(event.date)}</span>
             </div>
             <div className="event-card__meta-item">
-              <img src={iconClock} alt="" className="event-card__meta-icon" />
+              <IconClock className="event-card__meta-icon" />
               <span>{event.time}</span>
             </div>
           </div>
           <div className="event-card__meta-item">
-            <img src={iconLocation} alt="" className="event-card__meta-icon" />
+            <IconLocation className="event-card__meta-icon" />
             <span>{event.buildingName}</span>
           </div>
         </div>

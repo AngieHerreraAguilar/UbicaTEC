@@ -156,6 +156,7 @@
 [data-theme='dark'] .events-page__search-input { color: #fdfdfd; }
 [data-theme='dark'] .events-page__search-input::placeholder { color: #adb5bd; }
 [data-theme='dark'] .events-page__search-btn { color: #fdfdfd; }
+[data-theme='dark'] .events-page__state { color: #6c757d; }
 
 @media (min-width: 1024px) {
   .events-page__toolbar,

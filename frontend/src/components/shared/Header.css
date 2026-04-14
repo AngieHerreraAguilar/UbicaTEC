@@ -227,5 +227,9 @@
 [data-theme='dark'] .app-header__recents { background: #1c2a4e; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); }
 [data-theme='dark'] .app-header__result-name { color: #fdfdfd; }
 [data-theme='dark'] .app-header__result:hover { background: rgba(227, 234, 255, 0.08); }
+[data-theme='dark'] .app-header__recents-label { color: #adb5bd; }
+[data-theme='dark'] .app-header__result-building { color: #adb5bd; }
 [data-theme='dark'] .app-header__chip { background: rgba(227, 234, 255, 0.1); color: #fdfdfd; }
+[data-theme='dark'] .app-header__chip i { color: #adb5bd; }
 [data-theme='dark'] .app-header__chip:hover { background: rgba(227, 234, 255, 0.18); }
+[data-theme='dark'] .app-header__dropdown li + li { border-color: rgba(255, 255, 255, 0.06); }

@@ -31,3 +31,6 @@
   border-radius: 4px;
   background: #16213e;
 }
+
+[data-theme='dark'] .fc__dot { background: rgba(253, 253, 253, 0.15); }
+[data-theme='dark'] .fc__dot.is-active { background: #fdfdfd; }

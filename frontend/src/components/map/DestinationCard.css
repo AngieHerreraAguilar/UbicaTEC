@@ -217,8 +217,10 @@
   background: #1c2a4e;
   border-color: #2a3a5c;
 }
+[data-theme='dark'] .destination-card__eyebrow { color: #adb5bd; }
 [data-theme='dark'] .destination-card__title { color: #fdfdfd; }
 [data-theme='dark'] .destination-card__stat-icon { background: rgba(227, 234, 255, 0.1); color: #fdfdfd; }
+[data-theme='dark'] .destination-card__stat-label { color: #adb5bd; }
 [data-theme='dark'] .destination-card__stat-text strong { color: #fdfdfd; }
 [data-theme='dark'] .destination-card__close { background: rgba(255,255,255,0.1); color: #fdfdfd; }
 

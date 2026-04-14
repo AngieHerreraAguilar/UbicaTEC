@@ -1,11 +1,10 @@
 import { NavLink, useLocation } from 'react-router-dom'
-import iconMap from '../../assets/icon-map.svg'
-import iconTicket from '../../assets/icon-ticket.svg'
+import { IconMap, IconTicket } from './Icons'
 import './BottomNav.css'
 
 const TABS = [
-  { to: '/mapa', label: 'Mapa', icon: iconMap, iconPosition: 'right' },
-  { to: '/eventos', label: 'Eventos', icon: iconTicket, iconPosition: 'left' },
+  { to: '/mapa', label: 'Mapa', Icon: IconMap, iconPosition: 'right' },
+  { to: '/eventos', label: 'Eventos', Icon: IconTicket, iconPosition: 'left' },
 ]
 
 export default function BottomNav() {
@@ -32,11 +31,11 @@ export default function BottomNav() {
             }
           >
             {tab.iconPosition === 'left' && (
-              <img src={tab.icon} alt="" className="bottom-nav__icon" aria-hidden="true" />
+              <tab.Icon size={24} className="bottom-nav__icon" />
             )}
             <span className="bottom-nav__label">{tab.label}</span>
             {tab.iconPosition === 'right' && (
-              <img src={tab.icon} alt="" className="bottom-nav__icon" aria-hidden="true" />
+              <tab.Icon size={24} className="bottom-nav__icon" />
             )}
           </NavLink>
         ))}

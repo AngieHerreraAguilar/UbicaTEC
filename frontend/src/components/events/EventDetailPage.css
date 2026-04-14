@@ -354,10 +354,13 @@
 [data-theme='dark'] .event-detail__info-rows { background: rgba(255,255,255,0.05); }
 [data-theme='dark'] .event-detail__info-row i,
 [data-theme='dark'] .event-detail__info-row span { color: #e3eaff; }
+[data-theme='dark'] .event-detail__host-label { color: #6c757d; }
+[data-theme='dark'] .event-detail__location-sub { color: #6c757d; }
 [data-theme='dark'] .event-detail__location-button {
   color: #fdfdfd;
   border-color: #2a3a5c;
 }
+[data-theme='dark'] .event-detail__location-button:hover { background: rgba(255,255,255,0.05); }
 
 @media (min-width: 1024px) {
   .event-detail {

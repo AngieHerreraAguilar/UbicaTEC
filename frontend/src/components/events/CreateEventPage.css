@@ -614,6 +614,32 @@
 [data-theme='dark'] .ce-modal h3 { color: #fdfdfd; }
 [data-theme='dark'] .ce-success-overlay { background: rgba(15, 26, 51, 0.95); }
 [data-theme='dark'] .ce-success h2 { color: #fdfdfd; }
+[data-theme='dark'] .ce-field__label { color: #6073a6; }
+[data-theme='dark'] .create-event__sub { color: #adb5bd; }
+[data-theme='dark'] .create-event__section--border { border-color: #2a3a5c; }
+[data-theme='dark'] .ce-field__input-wrap--icon i { color: #fdfdfd; }
+[data-theme='dark'] .ce-field__currency-symbol { color: #fdfdfd; }
+[data-theme='dark'] .ce-field__helper { color: #6c757d; }
+[data-theme='dark'] .ce-field__chevron { color: #6c757d; }
+[data-theme='dark'] .ce-field__select:hover { border-color: #fdfdfd; }
+[data-theme='dark'] .ce-field__input-wrap:focus-within,
+[data-theme='dark'] .ce-field__textarea-wrap:focus-within { border-color: #fdfdfd; }
+[data-theme='dark'] .ce-upload__icon-circle { background: rgba(227, 234, 255, 0.1); }
+[data-theme='dark'] .ce-upload__icon-circle i { color: #fdfdfd; }
+[data-theme='dark'] .ce-upload__text { color: #fdfdfd; }
+[data-theme='dark'] .ce-upload__hint { color: #6c757d; }
+[data-theme='dark'] .ce-bento__card p { color: #adb5bd; }
+[data-theme='dark'] .ce-bento__card--featured i { color: #fdfdfd; }
+[data-theme='dark'] .ce-bento__card--featured.is-active {
+  border-color: #fdfdfd;
+  background: rgba(253, 253, 253, 0.06);
+}
+[data-theme='dark'] .ce-modal p { color: #adb5bd; }
+[data-theme='dark'] .ce-modal__cancel { border-color: #2a3a5c; color: #adb5bd; }
+[data-theme='dark'] .ce-btn-draft { color: #adb5bd; }
+[data-theme='dark'] .ce-btn-draft:hover { color: #fdfdfd; }
+[data-theme='dark'] .ce-success h2 { color: #fdfdfd; }
+[data-theme='dark'] .ce-success p { color: #adb5bd; }
 [data-theme='dark'] .ce-field__location-selects select { background: #1c2a4e; border-color: #2a3a5c; color: #fdfdfd; }
 
 @media (min-width: 1024px) {
