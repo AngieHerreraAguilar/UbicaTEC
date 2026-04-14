@@ -12,44 +12,111 @@ const headers = {
 const JOINED_KEY = 'ubicatec:joined-events'
 const DRAFT_KEY = 'ubicatec:event-draft'
 
-// ── API calls (Azure API Management) ──
+// ── TEMPORAL (Fase I): persistencia local para CRUD ──
+// El mock de Azure API Management no guarda datos reales.
+// Usamos localStorage para simular persistencia en el browser.
+// Eliminar todo este bloque cuando se conecte el backend real en Fase II.
+const LOCAL_EVENTS_KEY = 'ubicatec:local-events'
+
+function getLocalEvents() {
+  try { return JSON.parse(localStorage.getItem(LOCAL_EVENTS_KEY)) || [] }
+  catch { return [] }
+}
+
+function saveLocalEvents(events) {
+  localStorage.setItem(LOCAL_EVENTS_KEY, JSON.stringify(events))
+}
+
+function getDeletedIds() {
+  try { return JSON.parse(localStorage.getItem('ubicatec:deleted-events')) || [] }
+  catch { return [] }
+}
+
+function saveDeletedIds(ids) {
+  localStorage.setItem('ubicatec:deleted-events', JSON.stringify(ids))
+}
+// ── FIN bloque temporal ──
+
+// ── API calls (Azure API Management + localStorage temporal) ──
 
 export async function getEvents() {
   const url = `${BASE_URL}/`
   const response = await fetch(url, { headers })
-  const data = await response.json()
-  return Array.isArray(data) ? data : []
+  const remoteData = await response.json()
+  const remote = Array.isArray(remoteData) ? remoteData : []
+
+  // TEMPORAL (Fase I): combinar mock + eventos locales, filtrar eliminados
+  const local = getLocalEvents()
+  const deletedIds = getDeletedIds()
+  return [...remote, ...local].filter((ev) => !deletedIds.includes(ev.id))
 }
 
 export async function getEventById(id) {
+  // TEMPORAL (Fase I): buscar primero en localStorage
+  const local = getLocalEvents()
+  const found = local.find((ev) => ev.id === Number(id))
+  if (found) return found
+
   const response = await fetch(`${BASE_URL}/${id}`, { headers })
   return response.json()
 }
 
 export async function createEvent(eventData) {
-  const response = await fetch(`${BASE_URL}/`, {
+  // Llamar al mock para mantener la integración
+  await fetch(`${BASE_URL}/`, {
     method: 'POST',
     headers,
     body: JSON.stringify(eventData),
-  })
-  return response.json()
+  }).catch(() => {})
+
+  // TEMPORAL (Fase I): guardar en localStorage
+  const local = getLocalEvents()
+  const allEvents = [...local]
+  const maxId = allEvents.reduce((max, ev) => Math.max(max, ev.id || 0), 100)
+  const newEvent = { ...eventData, id: maxId + 1 }
+  local.push(newEvent)
+  saveLocalEvents(local)
+  return { success: true, message: 'Evento creado exitosamente', id: newEvent.id }
 }
 
 export async function updateEvent(id, eventData) {
-  const response = await fetch(`${BASE_URL}/${id}`, {
+  // Llamar al mock para mantener la integración
+  await fetch(`${BASE_URL}/${id}`, {
     method: 'PUT',
     headers,
     body: JSON.stringify(eventData),
-  })
-  return response.json()
+  }).catch(() => {})
+
+  // TEMPORAL (Fase I): actualizar en localStorage
+  const local = getLocalEvents()
+  const idx = local.findIndex((ev) => ev.id === Number(id))
+  if (idx !== -1) {
+    local[idx] = { ...local[idx], ...eventData }
+    saveLocalEvents(local)
+  }
+  return { success: true, message: 'Evento actualizado exitosamente' }
 }
 
 export async function deleteEvent(id) {
-  const response = await fetch(`${BASE_URL}/${id}`, {
+  // Llamar al mock para mantener la integración
+  await fetch(`${BASE_URL}/${id}`, {
     method: 'DELETE',
     headers,
-  })
-  return response.json()
+  }).catch(() => {})
+
+  // TEMPORAL (Fase I): eliminar de localStorage o marcar como eliminado
+  const local = getLocalEvents()
+  const idx = local.findIndex((ev) => ev.id === Number(id))
+  if (idx !== -1) {
+    local.splice(idx, 1)
+    saveLocalEvents(local)
+  } else {
+    // Es un evento del mock remoto, lo marcamos como eliminado
+    const deleted = getDeletedIds()
+    deleted.push(Number(id))
+    saveDeletedIds(deleted)
+  }
+  return { success: true, message: 'Evento eliminado exitosamente' }
 }
 
 // ── Client-side filtering & pagination ──
