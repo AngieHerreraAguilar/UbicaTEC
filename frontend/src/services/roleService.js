@@ -1,4 +1,4 @@
-// Role Service — STUB temporal (mirror del de Persona 3)
+// Role Service — integrado con authService real
 import { getCurrentUser } from './authService'
 
 export function canCreateEvent() {

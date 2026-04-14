@@ -185,8 +185,6 @@ export default function LoginPage() {
 
           {error && <p className="login__error">{error}</p>}
 
-          <p className="login__hint">STUB: usa <code>123456</code></p>
-
           <button type="button" className="login__btn" onClick={handleVerify} disabled={loading}>
             <span>{loading ? 'Verificando...' : 'Acceder al Panel'}</span>
             {!loading && <img src={arrowRight} alt="" className="login__btn-arrow" />}

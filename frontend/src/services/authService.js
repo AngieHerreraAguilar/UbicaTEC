@@ -1,7 +1,8 @@
-// Auth Service — STUB temporal
-// Este archivo será REEMPLAZADO por el que entregue Persona 1 (Azure API Management mocks).
-// API idéntica a la del plan del equipo para que la integración sea drop-in.
-// TODO(integración): eliminar stub, colocar authService.js real de Persona 1.
+// Auth Service — rutas a través del API Gateway (Persona 2)
+
+const API_GATEWAY = import.meta.env.VITE_API_GATEWAY_URL
+const API_KEY = import.meta.env.VITE_API_KEY
+const AUTH_URL = `${API_GATEWAY}/auth`
 
 const ALLOWED_DOMAINS = ['estudiantec.cr', 'itcr.ac.cr']
 const ADMIN_EMAILS = ['admin@itcr.ac.cr', 'profesor@itcr.ac.cr']
@@ -33,30 +34,35 @@ export function getRole(email) {
   return ADMIN_EMAILS.includes(email) ? 'admin' : 'estudiante'
 }
 
-// STUB: simula envío de código. El real hace fetch al API.
 export async function sendVerificationCode(email) {
-  await new Promise((r) => setTimeout(r, 600))
-  return {
-    success: true,
-    message: 'Código enviado (STUB: usa 123456)',
-    email,
-    expiresIn: 300,
-  }
+  const response = await fetch(`${AUTH_URL}/send-code`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Ocp-Apim-Subscription-Key': API_KEY,
+    },
+    body: JSON.stringify({ email }),
+  })
+  return response.json()
 }
 
-// STUB: cualquier código "123456" es válido.
 export async function verifyCode(email, code) {
-  await new Promise((r) => setTimeout(r, 500))
-  if (code !== '123456') {
-    return { success: false, error: 'Código inválido o expirado' }
+  const response = await fetch(`${AUTH_URL}/verify-code`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Ocp-Apim-Subscription-Key': API_KEY,
+    },
+    body: JSON.stringify({ email, code }),
+  })
+  const data = await response.json()
+  if (data.success && data.token) {
+    localStorage.setItem('auth_token', data.token)
+    localStorage.setItem('user_email', data.user.email)
+    localStorage.setItem('user_role', data.user.role)
+    emitAuthChange()
   }
-  const role = getRole(email)
-  const fakeToken = 'stub.' + btoa(JSON.stringify({ email, role })) + '.sig'
-  localStorage.setItem('auth_token', fakeToken)
-  localStorage.setItem('user_email', email)
-  localStorage.setItem('user_role', role)
-  emitAuthChange()
-  return { success: true, token: fakeToken, user: { email, role } }
+  return data
 }
 
 export function getCurrentUser() {
