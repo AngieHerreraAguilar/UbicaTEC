@@ -2,27 +2,5 @@
   "navigationFallback": {
     "rewrite": "/index.html",
     "exclude": ["/assets/*", "/*.ico", "/*.png", "/*.svg"]
-  },
-  "routes": [
-    {
-      "route": "/api/auth/*",
-      "allowedRoles": ["anonymous"],
-      "rewrite": "https://ubicatec-gateway.azure-api.net/auth/{*}"
-    },
-    {
-      "route": "/api/events/*",
-      "allowedRoles": ["anonymous"],
-      "rewrite": "https://ubicatec-gateway.azure-api.net/events/{*}"
-    },
-    {
-      "route": "/api/map/*",
-      "allowedRoles": ["anonymous"],
-      "rewrite": "https://ubicatec-gateway.azure-api.net/map/{*}"
-    }
-  ],
-  "responseOverrides": {
-    "404": {
-      "rewrite": "/index.html"
-    }
   }
 }
