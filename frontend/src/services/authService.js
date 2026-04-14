@@ -57,9 +57,13 @@ export async function verifyCode(email, code) {
   })
   const data = await response.json()
   if (data.success && data.token) {
+    // TEMPORAL (Fase I): el mock siempre devuelve el mismo rol.
+    // Usamos getRole() para determinar el rol a partir del email real.
+    // En Fase II con backend real, usar data.user.role directamente.
+    const realRole = getRole(email)
     localStorage.setItem('auth_token', data.token)
-    localStorage.setItem('user_email', data.user.email)
-    localStorage.setItem('user_role', data.user.role)
+    localStorage.setItem('user_email', email)
+    localStorage.setItem('user_role', realRole)
     emitAuthChange()
   }
   return data
