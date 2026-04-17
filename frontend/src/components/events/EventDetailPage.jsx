@@ -182,7 +182,7 @@ export default function EventDetailPage() {
           </div>
           <div className="event-detail__info-row">
             <i className="fi fi-rr-clock" />
-            <span>{formatTimeRange(event.time, event.endTime)}</span>
+            <span>{formatTimeRange(event.startHour, event.endHour)}</span>
           </div>
         </div>
       </section>

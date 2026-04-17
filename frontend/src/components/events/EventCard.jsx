@@ -42,7 +42,7 @@ export default function EventCard({ event }) {
             </div>
             <div className="event-card__meta-item">
               <IconClock className="event-card__meta-icon" />
-              <span>{event.time}</span>
+              <span>{event.startHour}</span>
             </div>
           </div>
           <div className="event-card__meta-item">
