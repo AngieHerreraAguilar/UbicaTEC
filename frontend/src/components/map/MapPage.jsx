@@ -5,6 +5,7 @@ import MapView from './MapView'
 import DestinationCard from './DestinationCard'
 import FloorSelector from './FloorSelector'
 import {
+  initMapData,
   getAvailableFloors, getBuildingById, getRoomById, searchAll,
   findRouteToRoom, findRouteFromPoint,
 } from '../../services/mapService'
@@ -18,12 +19,18 @@ export default function MapPage() {
   const fromPage = params.get('from')
   const selectRoomId = params.get('select')
 
+  const [ready, setReady] = useState(() => getAvailableFloors().length > 0)
   const [selection, setSelection] = useState(null)
   const [visible, setVisible] = useState(null)
   const [exiting, setExiting] = useState(false)
   const exitTimer = useRef(null)
   const floors = getAvailableFloors()
   const [floor, setFloor] = useState(floors[0] || 1)
+
+  // Ensure map data is loaded (covers direct navigation without splash)
+  useEffect(() => {
+    if (!ready) initMapData().then(() => setReady(true))
+  }, [ready])
 
   const [searchResults, setSearchResults] = useState([])
   const [routePath, setRoutePath] = useState(null)

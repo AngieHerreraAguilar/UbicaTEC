@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { initMapData } from '../../services/mapService'
 import watermarkBg from '../../assets/MapWatermarkBG.svg'
 import './Splash.css'
 
@@ -7,8 +8,11 @@ export default function Splash() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    const t = setTimeout(() => navigate('/mapa', { replace: true }), 2000)
-    return () => clearTimeout(t)
+    // Load map data from API, then navigate (min 1.5s for branding)
+    const min = new Promise((r) => setTimeout(r, 1500))
+    Promise.all([initMapData(), min]).then(() => {
+      navigate('/mapa', { replace: true })
+    })
   }, [navigate])
 
   return (
