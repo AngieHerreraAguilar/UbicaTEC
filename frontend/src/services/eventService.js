@@ -48,17 +48,24 @@ export async function getEvents() {
   // TEMPORAL (Fase I): combinar mock + eventos locales, filtrar eliminados
   const local = getLocalEvents()
   const deletedIds = getDeletedIds()
-  return [...remote, ...local].filter((ev) => !deletedIds.includes(ev.id))
+  const all = [...remote, ...local].filter((ev) => !deletedIds.includes(ev.id))
+
+  // Apply persisted available decrements from joinEvent
+  const overrides = getAvailOverrides()
+  return all.map((ev) => {
+    const dec = overrides[ev.id]
+    if (dec && ev.available != null && ev.capacity !== 0) {
+      return { ...ev, available: Math.max(0, ev.available - dec) }
+    }
+    return ev
+  })
 }
 
 export async function getEventById(id) {
-  // TEMPORAL (Fase I): buscar primero en localStorage
-  const local = getLocalEvents()
-  const found = local.find((ev) => ev.id === Number(id))
-  if (found) return found
-
-  const response = await fetch(`${BASE_URL}/${id}`, { headers })
-  return response.json()
+  // TEMPORAL (Fase I): el endpoint GET /events/:id del mock siempre
+  // devuelve el mismo evento. Usamos getEvents() y filtramos por id.
+  const all = await getEvents()
+  return all.find((ev) => ev.id === Number(id)) || null
 }
 
 export async function createEvent(eventData) {
@@ -164,11 +171,23 @@ export async function clearDraft() {
 
 // ── Event join persistence (local) ──
 
+const AVAIL_KEY = 'ubicatec:available-overrides'
+
+function getAvailOverrides() {
+  try { return JSON.parse(localStorage.getItem(AVAIL_KEY)) || {} }
+  catch { return {} }
+}
+
 export function joinEvent(eventId) {
   const joined = getJoinedEvents()
   if (!joined.includes(eventId)) {
     joined.push(eventId)
     localStorage.setItem(JOINED_KEY, JSON.stringify(joined))
+
+    // Persist the available decrement so it survives page reload
+    const overrides = getAvailOverrides()
+    overrides[eventId] = (overrides[eventId] || 0) + 1
+    localStorage.setItem(AVAIL_KEY, JSON.stringify(overrides))
   }
 }
 

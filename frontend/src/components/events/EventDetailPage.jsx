@@ -105,7 +105,7 @@ export default function EventDetailPage() {
   const isOpen = event?.capacity === 0
   const soldOut = !isOpen && event?.available != null && event.available <= 0
 
-  const handleJoin = () => {
+  const handleJoin = async () => {
     if (!isAuthenticated) {
       navigate(`/login?redirect=/evento/${id}&action=join`)
       return
@@ -114,9 +114,9 @@ export default function EventDetailPage() {
     joinEvent(Number(id))
     setJoined(true)
     setConfirmed((c) => c + 1)
-    if (!isOpen && event.available > 0) {
-      setEvent((ev) => ({ ...ev, available: ev.available - 1 }))
-    }
+    // Re-fetch to reflect persisted available decrement
+    const updated = await getEventById(id)
+    if (updated) setEvent(updated)
   }
 
   if (loading) return <div className="event-detail__state">Cargando...</div>

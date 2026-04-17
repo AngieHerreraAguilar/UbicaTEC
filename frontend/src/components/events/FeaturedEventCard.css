@@ -13,7 +13,7 @@
   overflow: hidden;
   text-decoration: none;
   color: #fdfdfd;
-  min-height: 218.5px;
+  height: 230px;
 }
 .featured-card:hover { text-decoration: none; }
 
@@ -69,6 +69,10 @@
   line-height: 22.75px;
   color: rgba(253, 253, 253, 0.7);
   margin-bottom: 24px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .featured-card__availability {
