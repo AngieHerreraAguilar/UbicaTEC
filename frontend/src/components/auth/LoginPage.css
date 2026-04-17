@@ -2,11 +2,15 @@
 .login {
   background: #fdfdfd;
   min-height: 100svh;
+  max-height: 100svh;
   padding: 24px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 24px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Top bar */
@@ -209,7 +213,7 @@
   background: transparent;
   font-family: var(--font-body);
   font-weight: 400;
-  font-size: 15px;
+  font-size: 16px;
   color: #16213e;
 }
 .login__input-wrap input::placeholder { color: #8e8e8e; }
@@ -410,6 +414,7 @@
   .login {
     justify-content: center;
     padding: 48px 0;
+    max-height: none;
   }
   .login__card {
     width: 420px;

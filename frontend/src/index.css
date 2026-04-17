@@ -29,3 +29,10 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+/* Prevent iOS auto-zoom on input focus (triggers at font-size < 16px) */
+@supports (-webkit-touch-callout: none) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
