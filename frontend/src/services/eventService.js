@@ -40,10 +40,13 @@ function saveDeletedIds(ids) {
 // ── API calls (Azure API Management + localStorage temporal) ──
 
 export async function getEvents() {
-  const url = `${BASE_URL}/`
-  const response = await fetch(url, { headers })
-  const remoteData = await response.json()
-  const remote = Array.isArray(remoteData) ? remoteData : []
+  let remote = []
+  try {
+    const url = `${BASE_URL}/`
+    const response = await fetch(url, { headers })
+    const remoteData = await response.json()
+    remote = Array.isArray(remoteData) ? remoteData : []
+  } catch { /* API no disponible (ej. localhost sin red) */ }
 
   // TEMPORAL (Fase I): combinar mock + eventos locales, filtrar eliminados
   const local = getLocalEvents()

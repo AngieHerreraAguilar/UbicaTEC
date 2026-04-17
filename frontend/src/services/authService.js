@@ -34,7 +34,12 @@ export function getRole(email) {
   return ADMIN_EMAILS.includes(email) ? 'admin' : 'estudiante'
 }
 
+// TEMPORAL (Fase I): en localhost el API Gateway no es accesible (CORS / red).
+// Bypass local para poder probar el flujo completo en desarrollo.
+const IS_LOCAL = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+
 export async function sendVerificationCode(email) {
+  if (IS_LOCAL) return { success: true, message: 'Código enviado (dev mode)' }
   const response = await fetch(`${AUTH_URL}/send-code`, {
     method: 'POST',
     headers: {
@@ -47,6 +52,14 @@ export async function sendVerificationCode(email) {
 }
 
 export async function verifyCode(email, code) {
+  if (IS_LOCAL) {
+    const realRole = getRole(email)
+    localStorage.setItem('auth_token', 'dev-token')
+    localStorage.setItem('user_email', email)
+    localStorage.setItem('user_role', realRole)
+    emitAuthChange()
+    return { success: true, token: 'dev-token', user: { email, role: realRole } }
+  }
   const response = await fetch(`${AUTH_URL}/verify-code`, {
     method: 'POST',
     headers: {

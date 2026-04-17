@@ -1,16 +1,60 @@
+/* ── Desktop arrow controls ── */
+.fc {
+  position: relative;
+}
+
+.fc__arrow {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .fc__arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: var(--bg-elevated);
+    box-shadow: var(--shadow-md);
+    color: var(--text-primary);
+    font-size: 16px;
+    cursor: pointer;
+    transition: opacity 0.2s ease, background 0.2s ease;
+  }
+  .fc__arrow:hover {
+    background: var(--bg-secondary);
+  }
+  .fc__arrow:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+  .fc__arrow--prev { left: -18px; }
+  .fc__arrow--next { right: -18px; }
+}
+
+.fc__viewport {
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
 .fc__track {
   display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
   gap: 0;
+  cursor: grab;
+  user-select: none;
+  will-change: transform;
+  touch-action: pan-y pinch-zoom;
 }
-.fc__track::-webkit-scrollbar { display: none; }
+.fc__track:active { cursor: grabbing; }
 
 .fc__slide {
   flex: 0 0 100%;
-  scroll-snap-align: start;
 }
 
 .fc__dots {

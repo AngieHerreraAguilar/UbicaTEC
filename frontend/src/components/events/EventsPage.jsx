@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { getEvents } from '../../services/eventService'
+import { getEvents, deleteEvent } from '../../services/eventService'
 import { useAuth } from '../../hooks/useAuth'
 import { logout } from '../../services/authService'
 import FeaturedCarousel from './FeaturedCarousel'
@@ -56,6 +56,11 @@ export default function EventsPage() {
       setQuery('')
       inputRef.current?.blur()
     }, 20)
+  }
+
+  const handleDelete = async (id) => {
+    await deleteEvent(id)
+    setEvents((prev) => prev.filter((ev) => ev.id !== id))
   }
 
   const featuredEvents = events.filter((ev) => ev.featured)
@@ -142,7 +147,7 @@ export default function EventsPage() {
               </div>
             )}
             {filteredRegulars.map((ev) => (
-              <EventCard key={ev.id} event={ev} />
+              <EventCard key={ev.id} event={ev} onDelete={handleDelete} />
             ))}
           </>
         ) : (

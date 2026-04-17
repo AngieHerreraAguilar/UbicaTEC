@@ -1,15 +1,104 @@
+/* ── Swipe-to-delete wrapper ── */
+.event-card-swipe {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 1px 1px 3.9px 0 rgba(0, 0, 0, 0.14);
+}
+
+.event-card-swipe__delete {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-accent);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #fff;
+  font-size: 20px;
+  z-index: 0;
+}
+
+/* Confirmation overlay */
+.event-card-swipe__confirm {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(15, 26, 51, 0.92);
+  border-radius: 8px;
+  animation: swipe-confirm-in 0.2s ease;
+}
+
+@keyframes swipe-confirm-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.event-card-swipe__confirm-text {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  color: #fff;
+  margin: 0;
+}
+
+.event-card-swipe__confirm-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.event-card-swipe__btn--cancel,
+.event-card-swipe__btn--delete {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 13px;
+  padding: 6px 18px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.event-card-swipe__btn--cancel {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+.event-card-swipe__btn--cancel:active {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.event-card-swipe__btn--delete {
+  background: var(--color-accent);
+  color: #fff;
+}
+.event-card-swipe__btn--delete:active {
+  background: var(--color-accent-hover);
+}
+
 /* Figma: 169:113 — EventContainer */
 .event-card {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: flex-end;
   gap: 8px;
   padding: 10px;
   background: #fdfdfd;
   border-radius: 8px;
-  box-shadow: 1px 1px 3.9px 0 rgba(0, 0, 0, 0.14);
   text-decoration: none;
   color: inherit;
   overflow: hidden;
+  will-change: transform;
+  touch-action: pan-y;
 }
 .event-card:hover { text-decoration: none; }
 

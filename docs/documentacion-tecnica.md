@@ -387,10 +387,10 @@ src/
 │   │   └── LoginPage.jsx          # Login + verificacion de codigo
 │   ├── events/
 │   │   ├── EventsPage.jsx         # Listado con busqueda y filtrado
-│   │   ├── EventCard.jsx          # Tarjeta de evento en lista
+│   │   ├── EventCard.jsx          # Tarjeta con swipe-to-delete
 │   │   ├── EventDetailPage.jsx    # Detalle completo + RSVP
 │   │   ├── CreateEventPage.jsx    # Formulario de creacion (admin)
-│   │   ├── FeaturedCarousel.jsx   # Carrusel de eventos destacados
+│   │   ├── FeaturedCarousel.jsx   # Carrusel draggable + flechas desktop
 │   │   ├── FeaturedEventCard.jsx  # Tarjeta de evento destacado
 │   │   ├── DatePicker.jsx         # Selector de fecha custom
 │   │   └── TimePicker.jsx         # Selector de hora custom
@@ -486,7 +486,32 @@ src/
 - Tablet: 768px - 1023px (frame centrado 420px)
 - Desktop: >= 1024px (sidebar lateral 240px)
 
-### 6.5 Persistencia local (Fase I)
+### 6.5 Micro-interacciones
+
+#### Swipe-to-delete (EventCard)
+
+Permite al organizador eliminar sus propios eventos sin navegar a otra pantalla.
+
+- **Condicion:** solo se habilita si `event.createdBy === usuario logueado`
+- **Mobile:** deslizar a la izquierda revela un boton rojo con icono de basura (80px)
+- **Desktop:** click + arrastrar a la izquierda (mismos mouse handlers)
+- **Confirmacion:** al tocar el boton aparece un overlay con "¿Eliminar este evento?" y botones Cancelar / Eliminar
+- **Prevencion de navegacion:** si hubo movimiento de drag, el click no navega al detalle del evento
+- **Threshold:** 72px de desplazamiento para activar el snap al boton; menor regresa a posicion original
+
+#### Carrusel de eventos destacados (FeaturedCarousel)
+
+Navegacion fluida entre tarjetas de eventos destacados.
+
+- **Drag nativo:** basado en `transform: translateX()` con seguimiento 1:1 del puntero
+- **Velocity detection:** un flick rapido (>0.3 px/ms) avanza al siguiente slide aunque el desplazamiento sea menor al 25%
+- **Rubber-band:** en los bordes el arrastre se atenua (factor 0.3) simulando elasticidad
+- **Easing:** `cubic-bezier(.25,.1,.25,1)` para el snap animado al soltar
+- **Desktop:** flechas prev/next (visibles solo en ≥1024px) + drag con mouse
+- **Mobile:** touch nativo + dots indicadores
+- **Prevencion de navegacion:** drag >4px bloquea el click en los links internos
+
+### 6.6 Persistencia local (Fase I)
 
 En Fase I, sin backend real, se usa `localStorage` para:
 
@@ -581,6 +606,9 @@ Se embeben en el build de Vite (reemplazo en tiempo de compilacion).
 - [ ] Login (paso codigo)
 - [ ] Login exitoso
 - [ ] Vista desktop (sidebar)
+- [ ] Swipe-to-delete en evento propio (boton rojo revelado)
+- [ ] Confirmacion de eliminacion (overlay)
+- [ ] Carrusel desktop con flechas de navegacion
 
 ---
 
