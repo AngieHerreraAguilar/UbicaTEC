@@ -6,19 +6,19 @@ Fase II del proyecto IC-6821 (Diseño de Software, valor 35%). **Entrega: 2026-0
 
 Pasamos de mocks en Azure API Management (Fase I) a un backend distribuido en microservicios reales sobre Azure App Services. El cuadro azul del diagrama de referencia es lo que construiremos. La Fase I dejó pendientes detectados en review (paginación faltante, JWT validado solo en frontend, latencia de primera carga sin justificar, búsqueda en frontend) que se resuelven naturalmente al mover lógica al backend.
 
-**Resultado esperado al cierre:** 4 microservicios desplegados detrás de APIM con mTLS, web con Web Push y WebSocket en tiempo real, colección Postman ejecutable y video demo de ≤5 min mostrando el flujo end-to-end.
+**Resultado esperado al cierre:** 4 microservicios desplegados detrás de APIM con mTLS, PWA con Web Push y WebSocket en tiempo real, colección Postman ejecutable y video demo de ≤5 min mostrando el flujo end-to-end.
 
 ---
 
 ## 1. Arquitectura objetivo
 
 ```
-Web (React+Vite, Service Worker minimal para push)
-   │ HTTPS                      │ WSS (a través de APIM Developer tier)
+PWA (React+Vite, Service Worker)
+   │ HTTPS                      │ WSS (bypass APIM, documentado)
    ▼                            │
-Azure API Management (Developer tier, encender on-demand)
-   │ mTLS (cert por MS)
-   ▼
+Azure API Management ──────────┐│
+   │ mTLS (cert por MS)        ││
+   ▼                           ▼▼
 Auth MS ─────► Azure SQL    Notifications MS ─► Service Bus (queue + topic)
 Events MS ───► Cosmos DB                       └► Table Storage
 Map MS ──────► Redis Cache                     └► Web Push (VAPID)
@@ -28,15 +28,15 @@ Map MS ──────► Redis Cache                     └► Web Push (VA
 | Componente | Owner | Stack | Almacenamiento |
 |---|---|---|---|
 | Auth MS | Kevin | Spring Boot 3 + Java 21 (hexagonal **obligatorio**) | Azure SQL Database |
-| Events MS | Armando | Node.js 20 + Express + Mongoose | Azure Cosmos DB (Mongo API) |
+| Events MS | Armando | Node.js 20 + Express + Mongoose | Azure Cosmos DB (Mongo API) + **Azure Blob Storage** (banners) |
 | Map MS | Angie | Python FastAPI ✓ confirmado por profe | Azure Cache for Redis |
 | Notifications MS | Angie | Python FastAPI | Azure Service Bus + Azure Table Storage |
-| n8n para email OTP de Auth | **Angie** (apoyo a Kevin) | n8n cloud free o self-host | webhook → SMTP |
+| n8n + Gmail SMTP para email OTP | **Angie owner total** | n8n cloud free + Gmail App Password | webhook → SMTP node |
 | Frontend + Service Worker (push) | **Angie** | React 19 + Vite + SW minimal | — |
 
 > **Carga de Angie:** Map MS + Notifications MS + setup n8n + frontend completo (badge + sección notificaciones + SW para push + todos los pendientes review). Es la persona con más superficie; Kevin (solo Auth, pero hexagonal+mTLS+JWT issuer es complejo) y Armando (Events con paginación server-side y publisher de Service Bus) tienen scope más acotado.
 
-**Tipos de almacenamiento distintos: 5** (SQL, NoSQL document, Cache, Queue/Topic, NoSQL key-value) — supera el mínimo de 3 del rubro.
+**Tipos de almacenamiento distintos: 6** (SQL, NoSQL document, Blob/object storage, Cache, Queue/Topic, NoSQL key-value) — supera el mínimo de 3 del rubro.
 
 **Decisiones cerradas (confirmadas con profe):**
 - **No hace falta PWA**. La web actual sirve como "mobile". Solo agregamos: (a) badge tipo Facebook con contador en el header, (b) sección/página de notificaciones, (c) push notifications via Web Push API (que requiere un Service Worker minimal — no PWA completa).
@@ -83,7 +83,7 @@ infrastructure/adapter/
 
 **Claims JWT:** `sub`, `email`, `role` (STUDENT/ADMIN), `iss=ubicatec-auth`, `aud=ubicatec`, `exp`. Algoritmo **RS256** (no HS256 — con 4 MS, manejar secreto compartido es frágil).
 
-**n8n para email OTP:** webhook desde el adapter. **Setup de n8n: Angie** (acordado con Kevin). Workflow: Webhook trigger → SMTP node (SendGrid free tier o Gmail SMTP con app password). Angie entrega a Kevin la URL del webhook + variables que debe enviar (`{email, code}`). **Fallback obligatorio**: adapter `SmtpFallbackAdapter` en el código de Kevin que envía directo si n8n responde error/timeout — así una caída de n8n no rompe el demo.
+**n8n + Gmail SMTP para email OTP:** Auth MS dispara webhook a n8n; n8n ejecuta workflow que envía vía Gmail SMTP. **Setup completo: Angie**. Sección 3.5 abajo tiene el contrato exacto Auth ↔ n8n.
 
 ### 2.2 Events (Armando) — Node.js + Express + Mongoose
 
@@ -100,12 +100,22 @@ infrastructure/adapter/
 - `PUT /:id`, `DELETE /:id` (admin)
 - `POST /:id/rsvp` → `$inc: {available: -1}` con guard `available > 0`, publica `rsvp.confirmed` en Service Bus queue.
 - `GET /mine` → eventos del usuario autenticado.
+- `POST /:id/banner` (admin, multipart/form-data) → sube imagen del banner a Azure Blob Storage, retorna `{bannerUrl}` y actualiza el documento del evento.
+- `DELETE /:id/banner` (admin) → borra blob y limpia el campo en Cosmos.
+
+**Azure Blob Storage para banners:**
+- Storage Account: `ubicateceventsstorage` (subscripción de Armando).
+- Container: `event-banners`, acceso público de lectura (Blob anonymous read).
+- Naming: `{eventId}/{timestamp}-{slug}.jpg` (versiona implícitamente al re-subir).
+- Validaciones server-side: `image/jpeg`, `image/png`, `image/webp`, max 2 MB.
+- URL pública: `https://ubicateceventsstorage.blob.core.windows.net/event-banners/{eventId}/...`. Se persiste en `Event.bannerUrl`.
+- SDK: `@azure/storage-blob` en Node.
 
 **Schemas:**
 ```js
 Event { _id, title, description, longDescription, type, date, startHour, endHour,
         buildingId, buildingName, roomId, roomName, organizer, capacity, available,
-        price, featured, secure, createdBy, createdAt, updatedAt }
+        price, featured, secure, bannerUrl, createdBy, createdAt, updatedAt }
 Rsvp  { _id, eventId, userId, email, createdAt — unique(eventId, userId) }
 ```
 Índice de texto en `title` + `description` para `?search=`.
@@ -179,6 +189,101 @@ Justificación de Service Bus vs Storage Queue: necesitamos topic+subscriptions,
 - Web: `pushManager.subscribe({applicationServerKey: VAPID_PUB_KEY})` → POST a `/subscribe`.
 - iOS Safari: solo funciona si el usuario hizo "Add to Home Screen" (iOS 16.4+). Demo principal en Chrome desktop/Android.
 
+### 3.5 n8n + Gmail SMTP para email OTP — contrato Auth ↔ n8n
+
+**Setup que hace Angie:**
+1. Crear cuenta en n8n.cloud (free tier) o auto-hostear en Azure Container Apps. Recomendado: n8n.cloud.
+2. Crear cuenta Gmail dedicada `ubicatec.notifs@gmail.com` (o usar una existente del equipo).
+3. Activar 2FA en esa cuenta y generar **App Password** (Settings → Security → 2-Step Verification → App passwords). Guardar los 16 caracteres.
+4. En n8n, crear el workflow descrito abajo y publicarlo (Activate workflow). Obtener URL del Webhook.
+5. Generar un **shared secret** aleatorio (32+ chars) para autenticar el webhook. Guardarlo en variables de n8n.
+6. **Entregar a Kevin:**
+   - URL del webhook (ej. `https://ubicatec.app.n8n.cloud/webhook/auth-otp`)
+   - Shared secret (lo manda en header `X-Webhook-Token`)
+
+**Workflow en n8n:**
+```
+Webhook (POST /auth-otp)
+  ↓
+IF node — validar header X-Webhook-Token == $env.WEBHOOK_SECRET
+  ↓ (pass)               ↓ (fail)
+Send Email (Gmail SMTP)   Respond Webhook 401
+  ↓
+Respond Webhook 200 con {sent: true, messageId: $node["Send Email"].messageId}
+```
+
+**Configuración del Send Email node (Gmail SMTP):**
+- Host: `smtp.gmail.com`
+- Port: `587`
+- User: `ubicatec.notifs@gmail.com`
+- Password: App Password (16 chars)
+- SSL/TLS: STARTTLS
+- From: `UbicaTEC <ubicatec.notifs@gmail.com>`
+- To: `={{$json.body.to}}`
+- Subject: `UbicaTEC - Tu código de verificación`
+- HTML body: ver template abajo
+
+**Template HTML del email** (n8n soporta interpolación `{{...}}`):
+```html
+<div style="font-family:sans-serif;max-width:480px;margin:auto;padding:24px;">
+  <h2 style="color:#16213e;">Tu código de verificación</h2>
+  <p>Hola, ingresa este código en UbicaTEC para completar tu inicio de sesión:</p>
+  <div style="font-size:32px;font-weight:bold;letter-spacing:8px;color:#e94560;
+              text-align:center;padding:16px;background:#f8f9fa;border-radius:8px;">
+    {{$json.body.code}}
+  </div>
+  <p style="color:#666;font-size:14px;">Expira en {{$json.body.expiresInMinutes}} minutos.
+     Si no solicitaste este código, ignora este correo.</p>
+</div>
+```
+
+---
+
+**Contrato HTTP — esto es lo que Kevin implementa en su `N8nWebhookEmailAdapter`:**
+
+**Request (Auth MS → n8n):**
+```http
+POST https://ubicatec.app.n8n.cloud/webhook/auth-otp
+Content-Type: application/json
+X-Webhook-Token: <shared-secret-de-Angie>
+
+{
+  "to": "estudiante@estudiantec.cr",
+  "code": "123456",
+  "expiresInMinutes": 10
+}
+```
+
+**Response success (200):**
+```json
+{ "sent": true, "messageId": "<smtp-message-id>" }
+```
+
+**Response error (401 / 5xx):**
+```json
+{ "sent": false, "error": "invalid token" | "smtp failure" | "..." }
+```
+
+**Comportamiento esperado de Kevin:**
+- Timeout HTTP: 10 segundos.
+- Si n8n responde 200 con `sent: true` → marcar OTP como enviado en BD.
+- Si responde 401, 4xx, 5xx, o timeout → log + retornar error al usuario "no pudimos enviar el código, intenta de nuevo".
+- **No reintentar automáticamente** desde el adapter (evita doble email si n8n sí envió pero la respuesta se perdió).
+
+**Variables que Angie le pasa a Kevin (para `application.yml` o env vars):**
+```yaml
+ubicatec.email.n8n:
+  webhook-url: https://ubicatec.app.n8n.cloud/webhook/auth-otp
+  webhook-secret: <secret>  # mismo que en n8n
+  timeout-ms: 10000
+```
+
+**Testing antes de integrar (Angie en semana 1-2):**
+1. Mandar OTP de prueba a `angie@estudiantec.cr` desde el "Test Workflow" de n8n.
+2. Verificar que llega a la bandeja de entrada (no spam).
+3. Si cae en spam, ajustar SPF/DKIM en Gmail (suelen estar OK por default) o cambiar el dominio del From.
+4. Repetir con correo de Kevin y Armando antes de declarar listo.
+
 ---
 
 ## 4. Frontend (web — no PWA completa, profe lo confirmó)
@@ -209,20 +314,20 @@ Justificación de Service Bus vs Storage Queue: necesitamos topic+subscriptions,
 **Pendientes Fase I (todos en este monorepo, owner: Angie):**
 
 Frontend:
-- `frontend/src/App.jsx` — login al inicio del flujo: si no autenticado, redirect a `/login` antes de Splash.
-- `frontend/src/components/map/MapView.jsx` — `minZoom` -1.
-- `frontend/src/services/eventService.js` — eliminar bloque localStorage TEMPORAL (líneas 15-38, lógica en CRUDs); llamar al backend real; eliminar `filterEvents`/`paginateEvents` (mover a server-side).
-- `frontend/src/components/events/EventsPage.jsx` — controles de paginación + filtros en URL state.
-- `frontend/src/services/mapService.js` — eliminar A* cliente, llamar `/map/route` y `/map/search`.
+- [`frontend/src/App.jsx`] — login al inicio del flujo: si no autenticado, redirect a `/login` antes de Splash.
+- [`frontend/src/components/map/MapView.jsx`] — `minZoom` -1.
+- [`frontend/src/services/eventService.js`] — eliminar bloque localStorage TEMPORAL (líneas 15-38, lógica en CRUDs); llamar al backend real; eliminar `filterEvents`/`paginateEvents` (mover a server-side).
+- [`frontend/src/components/events/EventsPage.jsx`] — controles de paginación + filtros en URL state.
+- [`frontend/src/services/mapService.js`] — eliminar A* cliente, llamar `/map/route` y `/map/search`.
 - Nuevo `LoadingBar` en `AppLayout` ligado a contador global de fetches.
-- `FloorSelector` — etiqueta "Piso 1 de 2" en lugar de "1/2".
+- [`FloorSelector`] — etiqueta "Piso 1 de 2" en lugar de "1/2".
 - Header: integrar icono de perfil → menú con logout, mis eventos, badge de notificaciones.
-- `frontend/.env.local.example` — unificar a `VITE_API_GATEWAY_URL`, `VITE_API_KEY`, `VITE_WS_URL`, `VITE_VAPID_PUBLIC_KEY`.
-- `frontend/src/services/authService.js` — quitar `IS_LOCAL` bypass, `ADMIN_EMAILS` hardcode, `getRole()` local; rol viene del JWT.
+- [`frontend/.env.local.example`] — unificar a `VITE_API_GATEWAY_URL`, `VITE_API_KEY`, `VITE_WS_URL`, `VITE_VAPID_PUBLIC_KEY`.
+- [`frontend/src/services/authService.js`] — quitar `IS_LOCAL` bypass, `ADMIN_EMAILS` hardcode, `getRole()` local; rol viene del JWT.
 
 Backend:
 - JWT validado server-side en cada MS (middleware).
-- Justificación de latencia: documentar cold-start de Spring Boot + APIM (8-15s primera petición). Mitigación: keep-alive cada 4min vía GitHub Action ping.
+- Justificación de latencia: documentar cold-start de Spring Boot + APIM Consumption (8-15s primera petición). Mitigación: keep-alive cada 4min vía GitHub Action ping.
 - n8n para envío de OTP (con fallback SMTP).
 
 ---
@@ -259,29 +364,33 @@ Env vars: `gateway`, `apiKey`, `accessToken`, `refreshToken`, `studentEmail`, `a
 
 | # | Riesgo | Mitigación |
 |---|---|---|
-| 1 | Spring Boot cold start 8-15s (causó la latencia de Fase I) | Always-On en B1, o keep-alive ping cada 4min vía GH Action |
+| 1 | Spring Boot cold start 8-15s en Consumption tier (causó la latencia de Fase I) | Always-On en B1, o keep-alive ping cada 4min vía GH Action |
 | 2 | mTLS no funciona en F1 | Forzar B1+ para todos los MS |
-| 3 | iOS Safari y Web Push (ya no aplica como bloqueo: profe dijo que la web sirve como mobile) | Demo principal en Chrome; documentar limitación de iOS Safari sin "Agregar a pantalla de inicio" |
-| 4 | Cosmos DB free tier: solo 1 instancia gratis por subscripción Azure | Cada quien tiene su propia subscripción, Armando la usa para Cosmos |
-| 5 | n8n SPOF en path crítico de auth | Adapter SMTP fallback en código de Kevin (SendGrid o Gmail SMTP) |
-| 6 | Costo Azure | Distribuido en 3 subscripciones Azure for Students ($100 c/u, total $300). APIM Developer (~50/mes) encendido on-demand. Map+Notif comparten App Service Plan B1 dentro de la subscripción de Angie. Apagar Redis y APIM cuando no se está demoeando. |
-| 7 | JWKS cache bugs entre 3 stacks | Usar libs probadas (jjwt, jose, python-jose) |
-| 8 | `ADMIN_EMAILS` hardcoded en frontend | Eliminar; rol viene del claim del JWT |
+| 3 | WS por APIM Consumption no soportado | Bypass directo al App Service. **Confirmar con profe antes de submit.** |
+| 4 | iOS Safari y Web Push (~~requiere PWA instalada~~ ya no aplica: profe dijo que la web sirve como mobile, demo en Chrome desktop/Android) | Demo principal en Chrome; documentar limitación de iOS Safari sin "Agregar a pantalla de inicio" |
+| 5 | Cosmos DB free tier: solo 1 instancia gratis por subscripción Azure | Cada quien tiene su propia subscripción, Armando la usa para Cosmos |
+| 6 | n8n.cloud caída → no se envía OTP → no hay login durante demo | Workflow probado con anticipación. En caso extremo durante demo: Angie tiene exportado el workflow JSON y puede hostear local en 5 min (n8n vía npx). Gmail SMTP es directo, n8n solo orquesta. |
+| 6b | Gmail rate-limit (~100/día desde cuenta gratuita) | Para demo no se acerca al límite. Si en prod necesitamos más, switch a SendGrid free tier (100/día también pero por API). |
+| 6c | Email cae en spam del TEC | Testing temprano (semana 2 día 1). SPF/DKIM viene auto con Gmail. From visible: `UbicaTEC <ubicatec.notifs@gmail.com>`. |
+| 7 | ~~Map y Notif ambos Python FastAPI~~ | **Resuelto**: profe confirmó que está bien |
+| 8 | Costo Azure | Distribuido en 3 subscripciones Azure for Students ($100 c/u, total $300). APIM Developer (~50/mes) encendido on-demand. Map+Notif comparten App Service Plan B1 dentro de la subscripción de Angie. Apagar Redis y APIM cuando no se está demoeando. |
+| 9 | JWKS cache bugs entre 3 stacks | Usar libs probadas (jjwt, jose, python-jose) |
+| 10 | `ADMIN_EMAILS` hardcoded en frontend | Eliminar; rol viene del claim del JWT |
 
 ---
 
 ## 8. Sprint plan (5 semanas)
 
 **Semana 1 (May 4-10) — Scaffolding + infra**
-- Angie: resource group, APIM, Service Bus namespace + queue + topic, Table Storage, Redis, App Service plans (Auth solo, Events solo, Map+Notif compartido). Generar certs mTLS.
+- Angie: resource group, APIM, Service Bus namespace + queue + topic, Table Storage, Redis, 3 App Service plans (Auth solo, Events solo, Map+Notif compartido). Generar certs mTLS.
 - Kevin: skeleton Spring Boot hexagonal, Flyway, JWT issuer + JWKS endpoint funcional local.
 - Armando: skeleton Express + Mongoose + conexión Cosmos + middleware JWT validator.
 - All: crear los 2 repos backend nuevos + CI/CD scaffolding.
 
 **Semana 2 (May 11-17) — Core endpoints**
-- Kevin: send-code, verify-code, refresh, me. Integrar webhook n8n (URL provisto por Angie) + SmtpFallbackAdapter. Deploy a App Service.
-- Armando: CRUD completo + paginación + filtering server-side. Service Bus publisher.
-- Angie: Map MS endpoints + Redis seed. Notifications MS skeleton + Service Bus consumer. **Setup n8n** (workflow Webhook→SMTP) y compartir URL del webhook con Kevin.
+- Kevin: send-code, verify-code, refresh, me. Integrar webhook n8n vía `N8nWebhookEmailAdapter` siguiendo el contrato de la sección 3.5 (URL + secret provistos por Angie). Deploy a App Service.
+- Armando: CRUD completo + paginación + filtering server-side. Service Bus publisher. Endpoints de banner (POST/DELETE `/:id/banner`) + Azure Blob Storage container `event-banners`.
+- Angie: Map MS endpoints + Redis seed. Notifications MS skeleton + Service Bus consumer. **Setup completo n8n + Gmail SMTP** (ver sección 3.5): cuenta Gmail dedicada, App Password, workflow en n8n.cloud, testing de deliverability a TEC. Entrega a Kevin la URL + secret en cuanto el workflow esté validado (idealmente día 1-2 de la semana 2 para no bloquear a Kevin).
 
 **Semana 3 (May 18-24) — Notifications + WS + push**
 - Angie (backend): Web Push end-to-end (VAPID, subscribe, send). WS con JWT-en-query. Topic broadcast handler.
@@ -337,8 +446,6 @@ Env vars: `gateway`, `apiKey`, `accessToken`, `refreshToken`, `studentEmail`, `a
 - `docs/documentacion-tecnica.md` — actualizar a Fase II
 - `mocks/campus-mock.json`, `mocks/pathways-mock.json` — seed de Map MS Redis
 
----
-
 ## Pendientes externos
 
 - [x] ~~Map+Notif ambos Python FastAPI~~ — profe confirmó que es OK.
@@ -348,4 +455,6 @@ Env vars: `gateway`, `apiKey`, `accessToken`, `refreshToken`, `studentEmail`, `a
 - [ ] Documentar el procedimiento de "encender APIM Developer" para que los 3 sepan reactivarlo cuando lo necesiten.
 - [ ] Coordinar con Kevin la URL/key de su APIM y App Service.
 - [ ] Coordinar con Armando lo mismo.
-- [ ] **Angie entrega a Kevin**: URL del webhook n8n + contrato del payload `{email, code}` (semana 1-2).
+- [ ] **Angie entrega a Kevin (semana 1-2)**: URL del webhook n8n + shared secret + confirmación de que ya hizo testing de deliverability a TEC. Contrato exacto en sección 3.5 del plan.
+- [ ] **Angie crea cuenta Gmail** dedicada `ubicatec.notifs@gmail.com` (o coordina con Kevin/Armando para usar una existente) y genera App Password.
+- [ ] **Armando** crea Azure Storage Account + container `event-banners` con acceso público de lectura.
