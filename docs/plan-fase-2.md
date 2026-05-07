@@ -149,6 +149,8 @@ Rsvp  { _id, eventId, userId, email, createdAt — unique(eventId, userId) }
 1. Queue `rsvp-confirmations` → notificación personal: persiste en Table Storage, push WS al socket del usuario, Web Push a sus suscripciones.
 2. Topic-subscription `events.notifier` → broadcast: persiste N filas (una por usuario activo), broadcast WS, Web Push fan-out.
 
+**Graceful shutdown (importante):** el handler de mensajes hace `await message.complete()` **solo después** de persistir + emitir WS + enviar push exitosamente. Si llega SIGTERM (deploy/scale-in) en medio de un mensaje, el `lifespan` cierra los receivers con `await receiver.close()` y el mensaje se libera al lock-timeout para reintento por otra instancia. Entrega es **at-least-once** — el cliente debe deduplicar por `notification.id`.
+
 **Tablas:**
 - `Notifications` (PK=email, RK=ulid; fields: title, body, kind, eventId, read, createdAt)
 - `PushSubs` (PK=email, RK=hash(endpoint); fields: endpoint, p256dh, auth)
@@ -188,6 +190,21 @@ Justificación de Service Bus vs Storage Queue: necesitamos topic+subscriptions,
 - Generar keypair una vez (`web-push generate-vapid-keys`), llave privada en App Service Configuration de Notifications.
 - Web: `pushManager.subscribe({applicationServerKey: VAPID_PUB_KEY})` → POST a `/subscribe`.
 - iOS Safari: solo funciona si el usuario hizo "Add to Home Screen" (iOS 16.4+). Demo principal en Chrome desktop/Android.
+
+### Observability — logs estructurados + Application Insights
+
+Cada MS escribe a stdout en JSON estructurado y App Service auto-shippea a Application Insights. Los 4 MS comparten un workspace de Log Analytics para queries cross-service.
+
+**Por stack:**
+- Auth (Spring Boot): `logback-spring.xml` con `LogstashEncoder`, dependencia `net.logstash.logback:logstash-logback-encoder`.
+- Events (Express): `pino` (`pino-pretty` en dev, JSON en prod).
+- Map / Notifications (FastAPI): `structlog` con `JSONRenderer`.
+
+**Correlation ID:** middleware en cada MS lee/genera header `X-Request-Id` y lo agrega a todos los logs y a los mensajes de Service Bus (`message.application_properties["correlationId"]`). Permite trazar un evento end-to-end: `traces | where customDimensions.correlationId == "..."`.
+
+**Configuración App Insights:** un solo recurso `ubicatec-insights` en la subscripción de Angie. Cada App Service apunta vía connection string en App Service Config (`APPLICATIONINSIGHTS_CONNECTION_STRING`). Auto-instrumentación captura HTTP requests, dependencies (Cosmos/Redis/Service Bus) y excepciones sin código adicional.
+
+**En el video demo:** mostrar una query en App Insights filtrando por `correlationId` del flujo "admin crea evento → notification entregada" — visualiza que los 4 MS colaboran.
 
 ### 3.5 n8n + Gmail SMTP para email OTP — contrato Auth ↔ n8n
 
@@ -270,13 +287,22 @@ X-Webhook-Token: <shared-secret-de-Angie>
 - Si responde 401, 4xx, 5xx, o timeout → log + retornar error al usuario "no pudimos enviar el código, intenta de nuevo".
 - **No reintentar automáticamente** desde el adapter (evita doble email si n8n sí envió pero la respuesta se perdió).
 
-**Variables que Angie le pasa a Kevin (para `application.yml` o env vars):**
+**Variables que Angie le pasa a Kevin (env vars en App Service Configuration, NO commiteadas):**
+
+`application.yml` (en repo) usa solo placeholders:
 ```yaml
 ubicatec.email.n8n:
-  webhook-url: https://ubicatec.app.n8n.cloud/webhook/auth-otp
-  webhook-secret: <secret>  # mismo que en n8n
-  timeout-ms: 10000
+  webhook-url: ${N8N_WEBHOOK_URL}
+  webhook-secret: ${N8N_WEBHOOK_SECRET}
+  timeout-ms: ${N8N_TIMEOUT_MS:10000}
 ```
+
+Valores reales en App Service Configuration (Spring inyecta automáticamente desde env):
+- `N8N_WEBHOOK_URL=https://ubicatec.app.n8n.cloud/webhook/auth-otp`
+- `N8N_WEBHOOK_SECRET=<secret>` (mismo que en n8n)
+- `N8N_TIMEOUT_MS=10000`
+
+Aplica el mismo patrón a JWT keypair, conn strings, VAPID keys, etc. — **nada con valores literales en repo**.
 
 **Testing antes de integrar (Angie en semana 1-2):**
 1. Mandar OTP de prueba a `angie@estudiantec.cr` desde el "Test Workflow" de n8n.
@@ -379,13 +405,29 @@ Env vars: `gateway`, `apiKey`, `accessToken`, `refreshToken`, `studentEmail`, `a
 
 ---
 
+## 7.5 Trade-offs arquitectónicos aceptados
+
+Auditoría 12-factor del plan: 7.5/12 fuerte, con 4 grietas. Implementamos las 3 baratas (graceful shutdown, structured logs/App Insights, `${VAR}` substitution); las siguientes las **aceptamos como deuda consciente** porque agregan complejidad desproporcionada para un proyecto de 5 semanas:
+
+| Trade-off | Costo de implementar bien | Por qué lo aceptamos | Riesgo si pasa | Cómo mencionarlo en el video |
+|---|---|---|---|---|
+| **Notifications WS no escala horizontalmente** (factor 6/8: procesos stateless / concurrency). Las conexiones WS viven en memoria del proceso; con 2+ instancias, broadcasts de la instancia A no llegan a clientes de la B. | Backplane Redis Pub/Sub: ~3h de código + tests. | En producción no necesitamos escalar más allá de 1 instancia para 200 estudiantes activos. El problema solo aparece con scale-out. | Si en demo levantamos 2 instancias, broadcasts inconsistentes. **Mitigación: 1 sola instancia en App Service Plan.** | "Para escalar horizontal usaríamos Redis Pub/Sub como backplane — siguiente paso de producción." |
+| **Cold start Spring Boot 8-15s** (factor 9: disposability). Auth MS tarda ~10s en arrancar; primera petición tras idle es lenta. | Cambiar a Quarkus o GraalVM native image: ~1-2 días de migración. | Spring Boot hexagonal es **requisito del rubro**, no podemos cambiar el framework. Quarkus + hexagonal es viable pero fuera de scope. | Primera petición lenta en demo se ve mal. **Mitigación: GitHub Action keep-alive cada 4 min para que nunca duerma.** | "Spring Boot tiene cold start; lo mitigamos con keep-alive scheduled. En prod usaríamos Always On (B1+) o Quarkus native." |
+| **Sin docker-compose para dev local** (factor 10: dev/prod parity). Cada dev levanta su MS contra Azure real (Cosmos, Redis, Service Bus de prod). | Compose con Mongo, Redis, Azurite, SB Emulator: ~2h. Mantenerlo: continuo. | El equipo es 3 personas trabajando en MS distintos; cada uno solo necesita su backing service. Azure for Students cubre el costo de dev. Compose multiplicaría el setup inicial. | Si cuota de Azure for Students se agota, dev queda bloqueado hasta recargar. | No mencionar (no es algo que el rubro evalúe). |
+| **Flyway corre en startup, no como step de CI** (factor 12: admin processes). | Mover a `mvn flyway:migrate` como step previo al deploy: ~1h. | Para cambios pequeños y poca data, startup migration es operacionalmente más simple. El smell solo importa cuando una migración tarda >app startup timeout. | Migración lenta podría tumbar el liveness probe. **Mitigación: migraciones pequeñas e idempotentes.** | No mencionar a menos que pregunten. |
+| **Entrega at-least-once de notificaciones** (factor 9). Service Bus puede reintregar el mismo mensaje si el worker muere antes de `complete()`. | Idempotencia transaccional con outbox pattern: ~1 día. | Es comportamiento estándar de mensajería; el cliente deduplica por `notification.id` (UI ya hace esto naturalmente al insertar en lista por id). | Notificación duplicada visible en UI raramente. | "Service Bus garantiza at-least-once; deduplicamos en cliente por id." |
+
+**Filosofía:** preferimos sistema sólido en los 6-7 ejes que importan al rubro y al demo (logs, config, dependencies, backing services, JWT/security, notificaciones funcionales) que sistema mediocre en los 12. Los trade-offs los mencionamos honestamente en el video — un equipo que sabe lo que NO está haciendo y por qué se ve mejor que uno que pretende cubrir todo.
+
+---
+
 ## 8. Sprint plan (5 semanas)
 
 **Semana 1 (May 4-10) — Scaffolding + infra**
-- Angie: resource group, APIM, Service Bus namespace + queue + topic, Table Storage, Redis, 3 App Service plans (Auth solo, Events solo, Map+Notif compartido). Generar certs mTLS.
-- Kevin: skeleton Spring Boot hexagonal, Flyway, JWT issuer + JWKS endpoint funcional local.
-- Armando: skeleton Express + Mongoose + conexión Cosmos + middleware JWT validator.
-- All: crear los 2 repos backend nuevos + CI/CD scaffolding.
+- Angie: resource group, APIM, Service Bus namespace + queue + topic, Table Storage, Redis, 3 App Service plans (Auth solo, Events solo, Map+Notif compartido). Generar certs mTLS. **Crear recurso Application Insights compartido** y compartir `APPLICATIONINSIGHTS_CONNECTION_STRING` con Kevin y Armando.
+- Kevin: skeleton Spring Boot hexagonal, Flyway, JWT issuer + JWKS endpoint funcional local. **Setup `logback-spring.xml` con LogstashEncoder y middleware de `X-Request-Id`.**
+- Armando: skeleton Express + Mongoose + conexión Cosmos + middleware JWT validator. **Setup `pino` JSON logging + middleware de `X-Request-Id`.**
+- All: crear los 2 repos backend nuevos + CI/CD scaffolding. **Configurar todos los secrets/connection strings vía App Service Configuration (env vars), nunca commitear valores literales.**
 
 **Semana 2 (May 11-17) — Core endpoints**
 - Kevin: send-code, verify-code, refresh, me. Integrar webhook n8n vía `N8nWebhookEmailAdapter` siguiendo el contrato de la sección 3.5 (URL + secret provistos por Angie). Deploy a App Service.
