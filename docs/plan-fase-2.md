@@ -50,6 +50,15 @@ Map MS ──────► Redis Cache                     └► Web Push (VA
 
 ## 2. Microservicios — detalle
 
+> **Filosofía arquitectónica:** cada MS escoge la arquitectura más adecuada a su problema, no aplicamos un patrón único universalmente. Esto demuestra criterio (esperado en el curso "Diseño de Software") y es defendible en el video. Resumen:
+>
+> | MS | Arquitectura | Patrones tácticos clave |
+> |---|---|---|
+> | Auth | Hexagonal (mandatory) | Port/Adapter, Repository, Use Case |
+> | Events | Layered | Repository, Adapter, Publisher, Middleware chain |
+> | Map | Layered + Strategy | Repository (cache), Strategy (pathfinding), DI nativa |
+> | Notifications | Hexagonal + event-driven interno | Port/Adapter, Observer/Pub-Sub, Repository, Domain Events |
+
 ### 2.1 Auth (Kevin) — Spring Boot 3, hexagonal
 
 **Endpoints (`/v1/auth`):**
@@ -84,6 +93,14 @@ infrastructure/adapter/
 **Claims JWT:** `sub`, `email`, `role` (STUDENT/ADMIN), `iss=ubicatec-auth`, `aud=ubicatec`, `exp`. Algoritmo **RS256** (no HS256 — con 4 MS, manejar secreto compartido es frágil).
 
 **n8n + Gmail SMTP para email OTP:** Auth MS dispara webhook a n8n; n8n ejecuta workflow que envía vía Gmail SMTP. **Setup completo: Angie**. Sección 3.5 abajo tiene el contrato exacto Auth ↔ n8n.
+
+**Patrones aplicados:** Port/Adapter, Repository, Use Case, DI por configuración Spring, JWKS pattern (llave pública vía endpoint estándar).
+
+**Trade-offs aceptados al escoger Hexagonal:**
+- vs **Layered**: ~20 archivos vs ~10. Más boilerplate (conversión DTO ↔ modelo de dominio en `AuthController`). **Aceptado**: el rubro lo exige + el patrón es el aprendizaje principal del curso.
+- vs **Clean Architecture**: hex es menos estricto (no requiere capas concéntricas con flujo de dependencias unidireccional duro). **Aceptado**: el rubro pide hex específicamente, no Clean.
+- vs **CQRS**: no separamos modelos read/write. **Aceptado**: `GET /me` es trivial, separar modelos sería overhead sin beneficio.
+- **Costo real**: si Kevin no había hecho hex, semana 1 tiene curva. Mitigado: layout completo arriba sirve como template.
 
 ### 2.2 Events (Armando) — Node.js + Express + Mongoose
 
@@ -122,6 +139,31 @@ Rsvp  { _id, eventId, userId, email, createdAt — unique(eventId, userId) }
 
 **JWT:** validador (rol = validador) — middleware con `jose` + JWKS cache 10min.
 
+**Arquitectura: Layered (route → controller → service → repository).**
+
+```
+src/
+  routes/        events.routes.js          → mapea HTTP a controllers
+  controllers/   events.controller.js      → valida req (express-validator), llama service, formatea response
+  services/      events.service.js         → lógica de negocio (paginación, RSVP atómico, banner)
+                 bus.publisher.js          → wrapper @azure/service-bus
+                 blob.uploader.js          → wrapper @azure/storage-blob (valida mime/size)
+  repositories/  events.repo.js            → queries Mongoose abstraídas (service no importa Mongoose directo)
+                 rsvps.repo.js
+  middleware/    auth.js (JWT) · requestId.js · errorHandler.js
+  models/        event.model.js · rsvp.model.js (schemas Mongoose)
+  config/        env.js (validación zod) · db.js (conexión)
+  app.js · server.js
+```
+
+**Patrones aplicados:** Repository, Adapter (`bus.publisher`, `blob.uploader` aíslan SDKs Azure), Publisher, Middleware chain, DTO validation at boundary (express-validator).
+
+**Trade-offs aceptados al escoger Layered:**
+- vs **Hexagonal**: perdemos uniformidad arquitectónica con Auth. La lógica de Mongoose puede filtrarse al service si no se cuida (mitigado con repos puros). **Aceptado**: hex con ~20 archivos es ceremonia injustificada para CRUD; Layered es idiomático en Express y permite a Armando avanzar más rápido.
+- vs **CQRS**: queries con filtros y commands viven en el mismo service. **Aceptado**: la diferencia entre read/write aquí no justifica el doble modelo + bus interno.
+- vs **MVC clásico**: equivalente a Layered en API REST (la "V" no aplica).
+- **Costo real**: tests de integración necesitan más setup que en hex (no se puede mockear "el port", hay que mockear Mongoose o usar mongodb-memory-server). Si en Fase III crece a 30+ endpoints con dominio complejo, el service layer engorda — momento para refactorizar.
+
 ### 2.3 Map (Angie) — FastAPI + Redis
 
 **Endpoints (`/v1/map`):**
@@ -133,6 +175,29 @@ Rsvp  { _id, eventId, userId, email, createdAt — unique(eventId, userId) }
 **Startup:** lee `mocks/campus-mock.json` + `pathways-mock.json` (incluidos en la imagen del MS), `SETEX` en Redis con TTL 24h. Re-seed si Redis devuelve 404.
 
 **JWT:** validador (read-only, pero igual gateado por consistencia).
+
+**Arquitectura: Layered + Strategy.**
+
+```
+app/
+  api/           routes.py                 → endpoints FastAPI
+  services/      map_service.py            → fuzzy search, orquesta pathfinding
+                 pathfinding/__init__.py   → interfaz Strategy (Pathfinder ABC)
+                 pathfinding/astar.py      → implementación A* (default)
+                 pathfinding/dijkstra.py   → opcional, demuestra swap-ability
+  repositories/  cache_repo.py             → wrapper Redis (get_campus, get_pathways)
+  schemas/       map.py                    → Pydantic request/response
+  core/          config.py · auth.py · logging.py · redis_client.py
+  main.py                                  → FastAPI app + lifespan (seed Redis al startup)
+```
+
+**Patrones aplicados:** Repository (cache_repo abstrae Redis), **Strategy** (pathfinding swappeable A* ↔ Dijkstra sin tocar service), DI con FastAPI `Depends()` (auth, redis, pathfinder), Pydantic schemas at boundaries, Cache-aside (seed on startup, refresh on miss).
+
+**Trade-offs aceptados al escoger Layered + Strategy:**
+- vs **Hexagonal**: si el día de mañana sumamos más sources de datos (DB real, no solo cache) o más algoritmos pesados, refactorizar a hex es trabajo. **Aceptado**: 4 endpoints read-only no justifican 6+ archivos de ports/adapters; un revisor podría leerlo como sobrediseño.
+- vs **Functional puro**: perdemos paradigma funcional puro pero ganamos DI nativa de FastAPI (`Depends`) y testabilidad que viene gratis con clases injectables. **Aceptado**: FastAPI premia clases con DI; ir functional pierde features del framework.
+- vs **Hexagonal + event-driven** (como Notifications): Map no tiene múltiples canales out, no aplica.
+- **Costo real**: el Strategy pattern aquí es parcialmente académico — no vamos a swappear A* a Dijkstra en runtime; el valor es pedagógico (mostramos que entendemos el patrón). Si fuera proyecto real, A* hardcoded estaría bien.
 
 ### 2.4 Notifications (Angie) — FastAPI + Service Bus + Table Storage + WS + Web Push
 
@@ -154,6 +219,54 @@ Rsvp  { _id, eventId, userId, email, createdAt — unique(eventId, userId) }
 **Tablas:**
 - `Notifications` (PK=email, RK=ulid; fields: title, body, kind, eventId, read, createdAt)
 - `PushSubs` (PK=email, RK=hash(endpoint); fields: endpoint, p256dh, auth)
+
+**Arquitectura: Hexagonal + event-driven interno.**
+
+```
+app/
+  domain/
+    models/                 → Notification, PushSubscription, NotificationKind enum
+    events/                 → NotificationCreated (evento de dominio interno)
+    ports/inbound/          → ReceiveRsvpUseCase, ReceiveBroadcastUseCase, ListNotificationsUseCase
+    ports/outbound/         → NotificationRepoPort, PushSubsRepoPort, WsBroadcasterPort, WebPushPort
+  application/
+    services/               → ReceiveRsvpService, BroadcastEventService, ListNotificationsService
+    event_bus.py            → in-memory dispatcher (~50 LOC): register handlers + emit
+    handlers/               → PersistHandler, WsBroadcastHandler, WebPushHandler
+                              (todos suscritos a NotificationCreated)
+  infrastructure/
+    inbound/
+      http/                 → FastAPI router (list, mark_read, vapid_key, subscribe)
+      ws/                   → WebSocket endpoint + connection registry (dict en memoria)
+      messaging/            → ServiceBusReceiverAdapter (queue rsvp + topic events)
+    outbound/
+      persistence/          → TableStorageNotifRepo, TableStoragePushSubsRepo
+      websocket/            → InMemoryWsBroadcaster
+      push/                 → PyWebPushAdapter
+    config/                 → env, lifespan (start receivers + register handlers), DI wiring
+  main.py
+```
+
+**Flujo end-to-end:**
+1. `ServiceBusReceiverAdapter` recibe mensaje del queue.
+2. Llama a `ReceiveRsvpService` (use case in-port).
+3. Service construye `Notification` y emite `event_bus.publish(NotificationCreated(...))`.
+4. Los 3 handlers suscritos se ejecutan en paralelo: `PersistHandler` → Table, `WsBroadcastHandler` → WS, `WebPushHandler` → Web Push.
+5. Solo después de que TODOS terminen, el adapter hace `await message.complete()` (graceful shutdown safe).
+
+**Patrones aplicados:** Hexagonal (Ports & Adapters), Adapter (cada infra implementa un puerto), **Observer / Pub-Sub interno** (event_bus dispatcha a múltiples handlers), Repository, Domain Events.
+
+**Beneficio del event-driven interno:** agregar canal nuevo (SMS, Slack, email push) = crear `SmsHandler` y suscribirlo al bus. **No toca** la lógica que procesa el mensaje del Service Bus ni los servicios de aplicación. Demostrable en video como "open-closed principle vivo".
+
+**Trade-offs aceptados al escoger Hexagonal + event-driven interno:**
+- vs **Hexagonal puro** (sin event_bus, services llaman directo a los out-ports): ~3 archivos extra (event_bus.py + handlers separados). **Aceptado**: el costo es mínimo y el beneficio (extensibilidad de canales out) es real para este dominio donde "qué hacer con una notificación" puede crecer.
+- vs **Layered**: tendríamos un service "fat" con WS + SB + Table + Push entremezclados. **Aceptado**: el problema tiene multiplicidad natural in/out — Layered lo aplastaría perdiendo claridad.
+- vs **CQRS**: read side (`GET /notifications`) es trivial, separar modelos no aporta. **Aceptado**: hex ya separa lectura de escritura vía puertos sin la complejidad de doble modelo.
+- vs **Pipes & Filters**: encajaría para el flujo SB → validate → enrich → persist, pero rompe con WS broadcaster (event-driven, no pipeline). **Aceptado**: mezclar dos paradigmas confunde.
+- **Costos reales**:
+  - Event bus en memoria → si proceso muere antes de que TODOS los handlers terminen, mensaje no se hace `complete()` y otra instancia lo reintenta (entrega at-least-once, ya documentado en sección 7.5).
+  - Más conceptos en cabeza (ports + handlers + bus). Mitigado: layout de arriba sirve como template, los 3 handlers iniciales son ~30 LOC cada uno.
+  - Para Fase II con 1 instancia, los handlers in-memory bastan. Para escalar horizontalmente necesitaríamos mover el dispatch a Redis Pub/Sub (ya documentado como deuda consciente en sección 7.5).
 
 ---
 
